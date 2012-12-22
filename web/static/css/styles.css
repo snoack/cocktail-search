@@ -1,0 +1,66 @@
+* {
+	font-family: 'Donegal One', serif !important;
+}
+
+h2, h2 a, h2 a:hover {
+	font-size: 1.2em;
+	line-height: 1.3em;
+	margin-top: 0;
+	color: #333;
+}
+
+body > * {
+	padding: 20px;
+}
+
+#ingredients {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: 228px;
+	overflow: auto;
+}
+
+#recipes {
+	margin-left: 260px;
+}
+
+.recipe {
+	width: 100%;
+	overflow: auto;
+	padding-top: 20px;
+}
+
+.recipe:first-child {
+	padding-top: 0;
+}
+
+.recipe > * {
+	float: left;
+}
+
+.picture {
+	margin-right: 20px;
+}
+
+.picture, .picture img {
+	width: 120px;
+}
+
+.details {
+	width: 500px;
+}
+
+.details li {
+	list-style-type: none;
+	text-indent: -1.5em;
+	font-size: 1.1em;
+	line-height: 1.5em;
+}
+
+.github-ribbon {
+	position: fixed;
+	top: 0;
+	right: 0;
+}

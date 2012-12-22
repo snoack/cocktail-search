@@ -1,0 +1,23 @@
+source recipes {
+	type = xmlpipe2
+	xmlpipe_command = $DIRNAME/xmlpipe.py $DIRNAME/../crawler/*.json
+}
+
+index recipes {
+	source = recipes
+	path = $DIRNAME/idx_recipes
+	charset_type = utf-8
+	morphology = libstemmer_en
+	wordforms = $DIRNAME/wordforms.txt
+	index_sp = 1
+}
+
+indexer {
+	mem_limit = 64M
+}
+
+searchd {
+	listen = $LISTEN
+	pid_file = $DIRNAME/searchd.pid
+	compat_sphinxql_magics = 0
+}
