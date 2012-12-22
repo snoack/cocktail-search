@@ -9,6 +9,9 @@ $(function() {
 	var offset = 0;
 	var can_load_more = false;
 
+	var ingredients;
+	var state;
+
 	var load = function(callback) {
 		can_load_more = false;
 
@@ -40,31 +43,40 @@ $(function() {
 		});
 	};
 
+	var updateHistory = function() {
+		if (state != document.location.hash)
+			history.pushState(null, null, state || '.');
+	};
+
 	var prepareField = function(field) {
 		field.keyup(function() {
-			var ingredients = [];
 			var has_empty = false;
+			var new_state;
+
+			ingredients = [];
 
 			$('input', form).each(function(idx, field) {
 				if (field.value != '')
-					ingredients.push(encodeURIComponent(field.value));
+					ingredients.push(field.value);
 				else
 					has_empty = true;
 			});
 
-			if (ingredients.length > 0)
-				history.pushState(null, null, '#' + ingredients.join(';'));
-			else
-				history.pushState(null, null, '.');
+			new_state  = ingredients.length > 0 ? '#' : '';
+			new_state += ingredients.map(encodeURIComponent).join(';');
 
-			if(!has_empty)
+			if (!has_empty)
 				addField();
 
-			loadInitial();
+			if (new_state != state) {
+				state = new_state;
+				loadInitial();
+			}
 		});
-		
+
 		field.blur(function() {
 			$('input[value=]', form).slice(0, -1).remove();
+			updateHistory();
 		});
 	};
 
@@ -78,22 +90,26 @@ $(function() {
 	};
 
 	var populateForm = function() {
-		var ingredients = document.location.hash.substring(1).split(';');
-		var field = $('input', form).first().val('');
+		state = document.location.hash;
+		ingredients = [];
 
-		$('input', form).slice(1).remove();
+		var bits = state.substring(1).split(';');
 
-		for (var i = 0; i < ingredients.length; i++) {
-			var ingredient = decodeURIComponent(ingredients[i]);
+		$('input', form).remove();
 
-			if (!ingredient)
+		for (var i = 0; i < bits.length; i++) {
+			var ingredient = decodeURIComponent(bits[i]);
+
+			if (ingredient == '')
 				continue;
 
-			field.val(ingredient);
 			field = addField();
+			field.val(ingredient);
+
+			ingredients.push(ingredient);
 		}
 
-		field.focus();
+		addField().focus();
 		loadInitial();
 	};
 
@@ -106,6 +122,7 @@ $(function() {
 		loadMore();
 	});
 
+	viewport.on('mousemove', updateHistory);
 	viewport.on('popstate', populateForm);
 
 	prepareField(initial_field);
