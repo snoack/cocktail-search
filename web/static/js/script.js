@@ -32,6 +32,7 @@ $(function() {
 
 		load(function(elements, n) {
 			recipes.html(elements);
+			window.scrollTo(0, 0);
 			offset = n;
 		});
 	};
