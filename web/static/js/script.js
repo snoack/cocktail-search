@@ -5,6 +5,7 @@ $(function() {
 
 	var initial_field = $('input', form);
 	var empty_field = initial_field.clone();
+	var original_title = document.title;
 
 	var offset = 0;
 	var can_load_more = false;
@@ -44,9 +45,20 @@ $(function() {
 		});
 	};
 
+	var updateTitle = function() {
+		var title = original_title;
+
+		if (ingredients.length > 0)
+			title += ': ' + ingredients.join(', ');
+
+		document.title = title;
+	};
+
 	var updateHistory = function() {
-		if (state != document.location.hash)
+		if (state != document.location.hash) {
 			history.pushState(null, null, state || '.');
+			updateTitle();
+		}
 	};
 
 	var prepareField = function(field) {
@@ -111,6 +123,8 @@ $(function() {
 		}
 
 		addField().focus();
+
+		updateTitle();
 		loadInitial();
 	};
 
