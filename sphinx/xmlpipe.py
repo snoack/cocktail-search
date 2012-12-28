@@ -3,10 +3,21 @@
 import sys
 import json
 import re
+from unicodedata import normalize
 
 from werkzeug.utils import escape
+from Stemmer import Stemmer
 
 ee = lambda s: escape(s).encode('utf-8')
+stemmer = Stemmer('english')
+
+def normalize_title(s):
+	s = re.sub(r'[^\w\s]', '', normalize('NFKD', s)).lower()
+	s = ' '.join(stemmer.stemWords(s.split()))
+	s = re.match('(?:the )?(.*?)(?: cocktail)?(?: for a crowd)?$', s).group(1)
+	s = s.replace(' ', '')
+
+	return s
 
 def xmlpipe():
 	print '<?xml version="1.0" encoding="utf-8"?>'
@@ -14,9 +25,10 @@ def xmlpipe():
 
 	print '<sphinx:schema>'
 	print '<sphinx:field name="title" attr="string"/>'
+	print '<sphinx:field name="title_normalized" attr="string"/>'
+	print '<sphinx:field name="ingredients"/>'
 	print '<sphinx:attr name="url" type="string"/>'
 	print '<sphinx:attr name="picture" type="string"/>'
-	print '<sphinx:field name="ingredients"/>'
 	print '<sphinx:attr name="ingredients_text" type="string"/>'
 	print '</sphinx:schema>'
 
@@ -33,6 +45,10 @@ def xmlpipe():
 
 				if doc['picture']:
 					print '<picture>%s</picture>' % ee(doc['picture'])
+
+				print '<title_normalized>%s</title_normalized>' % ee(
+					normalize_title(doc['title'])
+				)
 
 				print '<ingredients>%s</ingredients>' % ee('!'.join(
 					re.sub(r'[.!?\s]+', ' ', x)

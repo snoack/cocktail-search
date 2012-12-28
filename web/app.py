@@ -13,7 +13,8 @@ try:
 except ImportError:
 	settings = None
 
-PAGE_SIZE = 20
+MAX_COCKTAILS_PER_PAGE = 20
+MAX_RECIPES_PER_COCKTAIL = 10
 
 SPHINX_HOST = getattr(settings, 'SPHINX_HOST', 'localhost')
 SPHINX_PORT = getattr(settings, 'SPHINX_PORT', 9312)
@@ -36,13 +37,7 @@ class CocktailsApp(object):
 		Rule('/recipes', endpoint='recipes'),
 	])
 
-	def on_recipes(self, request):
-		ingredients = [s for s in request.args.getlist('ingredient') if s.strip()]
-
-		if not ingredients:
-			return Response('', mimetype='text/html')
-
-		sphinx = sphinxapi.SphinxClient()
+	def query(self, sphinx, ingredients, offset):
 		query = '@ingredients ' + ' | '.join(
 			'(%s)' % ' SENTENCE '.join(
 				'"%s"' % sphinx.EscapeString(word)
@@ -51,40 +46,94 @@ class CocktailsApp(object):
 			) for s in ingredients
 		)
 
+		sphinx.SetMatchMode(sphinxapi.SPH_MATCH_EXTENDED2)
+		sphinx.SetLimits(offset, MAX_COCKTAILS_PER_PAGE)
+		sphinx.SetGroupBy('title_normalized', sphinxapi.SPH_GROUPBY_ATTR, '@relevance DESC, @count DESC, @id ASC')
+
+		result = sphinx.Query(query)
+		if not result:
+			return None
+
+		sphinx.SetLimits(0, MAX_RECIPES_PER_COCKTAIL)
+		sphinx.ResetGroupBy()
+
+		matches = result['matches']
+		cocktails = []
+
+		if matches:
+			for match in matches:
+				sphinx.AddQuery('(%s) & @title_normalized "^%s$"' % (
+					query, sphinx.EscapeString(match['attrs']['title_normalized'])
+				))
+
+			results = sphinx.RunQueries()
+			if not results:
+				return None
+
+			for result in results:
+				if result['status'] == sphinxapi.SEARCHD_ERROR:
+					return None
+
+				cocktails.append(result['matches'])
+
+		return cocktails
+
+	def on_recipes(self, request):
+		ingredients = [s for s in request.args.getlist('ingredient') if s.strip()]
+
+		if not ingredients:
+			return Response('', mimetype='text/html')
+
 		try:
 			offset = int(request.args['offset'])
 		except (ValueError, KeyError):
 			offset = 0
 
+		sphinx = sphinxapi.SphinxClient()
 		sphinx.SetServer(SPHINX_HOST, SPHINX_PORT)
-		sphinx.SetMatchMode(sphinxapi.SPH_MATCH_EXTENDED2)
-		sphinx.SetLimits(offset, PAGE_SIZE)
-
 		sphinx.Open()
 		try:
-			result = sphinx.Query(query)
+			cocktails = self.query(sphinx, ingredients, offset)
 		finally:
 			sphinx.Close()
 
-		if result:
-			output = '\n'.join(
-				RECIPE_TEMPLATE % {
-					'title': escape(m['attrs']['title']),
-					'url': escape(m['attrs']['url']),
-					'picture': '<a href="%s"><img src="%s" alt="%s"/></a>' % (
-						escape(m['attrs']['url']),
-						escape(m['attrs']['picture']),
-						escape(m['attrs']['title']),
-					) if m['attrs']['picture'] else '&nbsp;',
-					'ingredients': ''.join(
-						'<li>%s</li>' % escape(s) for s in m['attrs']['ingredients_text'].splitlines()
-					),
-				} for m in result['matches']
-			)
-		else:
-			output = '<div class="alert">%s</div>' % escape(sphinx.GetLastError())
+		output = []
 
-		return Response(output, mimetype='text/html')
+		if cocktails is None:
+			output.append('<div class="alert">')
+			output.append(escape(sphinx.GetLastError()))
+			output.append('</div>')
+		else:
+			for recipes in cocktails:
+				output.append('<div class="cocktail">')
+				output.append('<ul class="nav nav-pills">')
+
+				for recipe in recipes:
+					output.append('<li><a href="')
+					output.append(escape(recipe['attrs']['url']))
+					output.append('"><span></span></a></li>')
+
+				output.append('</ul>')
+
+				for recipe in recipes:
+					attrs = recipe['attrs']
+
+					output.append(RECIPE_TEMPLATE % {
+						'title': escape(attrs['title']),
+						'url': escape(attrs['url']),
+						'picture': '<a href="%s"><img src="%s" alt="%s"/></a>' % (
+							escape(attrs['url']),
+							escape(attrs['picture']),
+							escape(attrs['title']),
+						) if attrs['picture'] else '&nbsp;',
+						'ingredients': ''.join(
+							'<li>%s</li>' % escape(s) for s in attrs['ingredients_text'].splitlines()
+						),
+					})
+
+				output.append('</div>')
+
+		return Response(''.join(output), mimetype='text/html')
 
 	def dispatch_request(self, request):
 		adapter = self.urls.bind_to_environ(request.environ)

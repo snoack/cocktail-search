@@ -13,6 +13,11 @@ body > * {
 	padding: 20px;
 }
 
+.nav-pills > .active > a,
+.nav-pills > .active > a:hover {
+	background-color: #333;
+}
+
 #ingredients {
 	position: fixed;
 	top: 0;
@@ -22,22 +27,61 @@ body > * {
 	overflow: auto;
 }
 
-#recipes {
+#cocktails {
 	margin-left: 260px;
 }
 
-.recipe {
+.cocktail {
 	width: 100%;
 	overflow: auto;
-	padding-top: 20px;
+	padding-bottom: 30px;
+	position: relative;
 }
 
-.recipe:first-child {
+.cocktail:last-child {
+	padding-bottom: 0;
+}
+
+.cocktail .nav-pills {
+	position: absolute;
+	top: 0;
+	left: 400px;
+}
+
+.cocktail .nav-pills > li > a {
 	padding-top: 0;
+	padding-bottom: 0;
+	margin-top: 0;
+}
+
+.cocktail .nav-pills > li > a > span {
+	display: inline-block;
+	width: 24px;
+	height: 24px;
+	background: url(../img/sources.png);
+}
+
+.cocktail .nav-pills > li      > a[href^="http://liquor.com/"]          > span { background-position:   0     0;   }
+.cocktail .nav-pills > .active > a[href^="http://liquor.com/"]          > span { background-position: -24px   0;   }
+.cocktail .nav-pills > li      > a[href^="http://www.seriouseats.com/"] > span { background-position:   0   -24px; }
+.cocktail .nav-pills > .active > a[href^="http://www.seriouseats.com/"] > span { background-position: -24px -24px; }
+.cocktail .nav-pills > li      > a[href^="http://en.wikipedia.org/"]    > span { background-position:   0   -48px; }
+.cocktail .nav-pills > .active > a[href^="http://en.wikipedia.org/"]    > span { background-position: -24px -48px; }
+.cocktail .nav-pills > li      > a[href^="http://www.esquire.com/"]     > span { background-position:   0   -72px; }
+.cocktail .nav-pills > .active > a[href^="http://www.esquire.com/"]     > span { background-position: -24px -72px; }
+
+.recipe {
+	width: 640px;
+	overflow: auto;
 }
 
 .recipe > * {
 	float: left;
+}
+
+
+.recipe h2 {
+	width: 250px;
 }
 
 .picture {

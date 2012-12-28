@@ -1,5 +1,5 @@
 $(function() {
-	var recipes = $('#recipes');
+	var cocktails = $('#cocktails');
 	var form = $('form');
 	var viewport = $(window);
 
@@ -20,10 +20,31 @@ $(function() {
 			data: form.serializeArray().concat([{name: 'offset', value: offset}]),
 			success: function(data) {
 				var elements = $(data);
-				var n = elements.filter('.recipe').length;
+				var n = elements.filter('.cocktail').length;
 
 				callback(elements, n);
 				can_load_more = n > 1;
+
+				$($('.cocktail').slice(-n)).each(function(idx, cocktail) {
+					var items = $('.nav-pills > li', cocktail);
+					var recipes = $('.recipe', cocktail);
+
+					var focusItem = function(idx) {
+						items.removeClass('active');
+						$(items[idx]).addClass('active');
+
+						recipes.css('display', 'none');
+						$(recipes[idx]).css('display', 'block');
+					};
+
+					items.each(function(idx, item) {
+						$(item).mouseover(function() {
+							focusItem(idx);
+						});
+					});
+
+					focusItem(0);
+				});
 			}
 		});
 	};
@@ -32,7 +53,7 @@ $(function() {
 		offset = 0;
 
 		load(function(elements, n) {
-			recipes.html(elements);
+			cocktails.html(elements);
 			window.scrollTo(0, 0);
 			offset = n;
 		});
@@ -40,7 +61,7 @@ $(function() {
 
 	var loadMore = function() {
 		load(function(elements, n) {
-			recipes.append(elements);
+			cocktails.append(elements);
 			offset += n;
 		});
 	};
@@ -131,7 +152,7 @@ $(function() {
 	viewport.scroll(function() {
 		if (!can_load_more)
 			return;
-		if (viewport.scrollTop() + viewport.height() < $('.recipe').slice(-5)[0].offsetTop)
+		if (viewport.scrollTop() + viewport.height() < $('.cocktail').slice(-5)[0].offsetTop)
 			return;
 
 		loadMore();
