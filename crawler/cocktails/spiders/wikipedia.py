@@ -44,7 +44,7 @@ class WikipediaSpider(CrawlSpider):
 			if not ingredients:
 				continue
 
-			for picture in recipe.select("tr[position() <= 2]//img/@src | preceding-sibling::*[contains(concat(' ', normalize-space(@class), ' '), ' thumb ')]//img/@src").extract():
+			for picture in recipe.select("tr/td[@colspan='2']//img/@src | preceding-sibling::*[contains(concat(' ', normalize-space(@class), ' '), ' thumb ')]//img/@src").extract():
 				picture = urljoin(response.url, picture)
 				break
 			else:
