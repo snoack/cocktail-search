@@ -1,10 +1,10 @@
 source recipes {
 	type = xmlpipe2
 	xmlpipe_command = $DIRNAME/xmlpipe.py \
-		$DIRNAME/../crawler/liquor.json \
-		$DIRNAME/../crawler/seriouseats.json \
-		$DIRNAME/../crawler/esquire.json \
-		$DIRNAME/../crawler/wikipedia.json
+		-i $DIRNAME/../crawler/liquor.json \
+		-i $DIRNAME/../crawler/seriouseats.json \
+		-i $DIRNAME/../crawler/esquire.json \
+		-u $DIRNAME/../crawler/wikipedia.json
 }
 
 index recipes {

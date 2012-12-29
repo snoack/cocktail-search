@@ -4,6 +4,8 @@ import sys
 import json
 import re
 from unicodedata import normalize
+from itertools import imap, groupby
+from difflib import SequenceMatcher
 
 from werkzeug.utils import escape
 from Stemmer import Stemmer
@@ -19,6 +21,13 @@ def normalize_title(s):
 
 	return s
 
+def drop_duplicates(items):
+	key = lambda item: normalize_title(item['title'])
+	items = sorted(items, key=key)
+
+	for title, items in groupby(items, key):
+		yield max(items, key=lambda item: SequenceMatcher(None, title, item['url'].lower()).ratio())
+
 def xmlpipe():
 	print '<?xml version="1.0" encoding="utf-8"?>'
 	print '<sphinx:docset>'
@@ -32,32 +41,44 @@ def xmlpipe():
 	print '<sphinx:attr name="ingredients_text" type="string"/>'
 	print '</sphinx:schema>'
 
+	unique = False
 	i = 1
 
-	for filename in sys.argv[1:]:
-		with open(filename) as file:
-			for line in file:
-				doc = json.loads(line)
+	for arg in sys.argv[1:]:
+		if arg == '-i':
+			unique = False
+			continue
 
+		if arg == '-u':
+			unique = True
+			continue
+
+		with open(arg) as file:
+			items = imap(json.loads, file)
+
+			if unique:
+				items = drop_duplicates(items)
+
+			for item in items:
 				print '<sphinx:document id="%d">' % i
-				print '<title>%s</title>' % ee(doc['title'])
-				print '<url>%s</url>' % ee(doc['url'])
+				print '<title>%s</title>' % ee(item['title'])
+				print '<url>%s</url>' % ee(item['url'])
 
-				if doc['picture']:
-					print '<picture>%s</picture>' % ee(doc['picture'])
+				if item['picture']:
+					print '<picture>%s</picture>' % ee(item['picture'])
 
 				print '<title_normalized>%s</title_normalized>' % ee(
-					normalize_title(doc['title'])
+					normalize_title(item['title'])
 				)
 
 				print '<ingredients>%s</ingredients>' % ee('!'.join(
 					re.sub(r'[.!?\s]+', ' ', x)
-						for y in (doc['ingredients'], doc.get('extra_ingredients', []))
+						for y in (item['ingredients'], item.get('extra_ingredients', []))
 						for x in y
 				))
 
 				print '<ingredients_text>%s</ingredients_text>' % ee('\n'.join(
-					doc['ingredients']
+					item['ingredients']
 				))
 
 				print '</sphinx:document>'
