@@ -2,3 +2,4 @@ whisky > whiskey
 whisk(e)y > whiskey
 rhum > rum
 akvavit > aquavit
+ginger beer > gingerbeer

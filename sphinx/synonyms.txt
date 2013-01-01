@@ -8,3 +8,4 @@ peychaud > bitters
 kahlua > coffee liqueur
 kahlúa > coffee liqueur
 espresso > coffee
+ginger beer > ginger

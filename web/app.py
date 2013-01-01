@@ -41,8 +41,12 @@ class CocktailsApp(object):
 		query = '@ingredients ' + ' | '.join(
 			'(%s)' % ' SENTENCE '.join(
 				'"%s"' % sphinx.EscapeString(word)
-					for x in re.findall(r'"(.*?)(?:"|$)|(\S+)', s)
-					for word in x if word
+					for quoted, unquoted in re.findall(r'"(.*?)(?:"|$)|([^"]+)', s)
+					for word in (quoted and [quoted] or [
+						kw['tokenized'] for kw in sphinx.BuildKeywords(
+							unquoted.encode('utf-8'), 'recipes', 0
+						)
+					])
 			) for s in ingredients
 		)
 
