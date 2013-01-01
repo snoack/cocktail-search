@@ -1,0 +1,10 @@
+bourbon > whiskey
+rye > whiskey
+scotch > whiskey
+cognac > brandy
+calvados > brandy
+angostura > bitters
+peychaud > bitters
+kahlua > coffee liqueur
+kahlúa > coffee liqueur
+espresso > coffee

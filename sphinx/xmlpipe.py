@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import sys
+import os
 import json
 import re
 from unicodedata import normalize
@@ -27,6 +28,35 @@ def drop_duplicates(items):
 
 	for title, items in groupby(items, key):
 		yield max(items, key=lambda item: SequenceMatcher(None, title, item['url'].lower()).ratio())
+
+def load_synonyms():
+	synonyms = {}
+
+	with open(os.path.join(os.path.dirname(__file__), 'synonyms.txt')) as f:
+		for line in f:
+			a, b = line.decode('utf-8').split('>')
+
+			a = a.strip().lower()
+			b = b.strip()
+
+			synonyms.setdefault(a, []).append(b)
+
+	return synonyms
+
+def compile_synonyms():
+	synonyms = load_synonyms()
+	regex = re.compile(r'\b(?:%s)\b' % '|'.join(imap(re.escape, synonyms)), re.I)
+
+	return (
+		lambda s: regex.sub((
+			lambda m: (
+				lambda term:
+					' '.join([term] + synonyms[term.lower()])
+			)(m.group(0))
+		), s)
+	)
+
+expand_synonyms = compile_synonyms()
 
 def xmlpipe():
 	print '<?xml version="1.0" encoding="utf-8"?>'
@@ -72,7 +102,7 @@ def xmlpipe():
 				)
 
 				print '<ingredients>%s</ingredients>' % ee('!'.join(
-					re.sub(r'[.!?\s]+', ' ', x)
+					re.sub(r'[.!?\s]+', ' ', expand_synonyms(x))
 						for y in (item['ingredients'], item.get('extra_ingredients', []))
 						for x in y
 				))
