@@ -3,7 +3,7 @@ $(function() {
 	var form = $('form');
 	var viewport = $(window);
 
-	var initial_field = $('input', form);
+	var initial_field = $('input', form).val('');;
 	var empty_field = initial_field.clone();
 	var original_title = document.title;
 
