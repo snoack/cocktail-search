@@ -1,4 +1,6 @@
 $(function() {
+	var is_touch_device = 'ontouchstart' in document.documentElement;
+
 	var cocktails = $('#cocktails');
 	var form = $('form');
 	var viewport = $(window);
@@ -33,14 +35,21 @@ $(function() {
 						items.removeClass('active');
 						$(items[idx]).addClass('active');
 
-						recipes.css('display', 'none');
-						$(recipes[idx]).css('display', 'block');
+						recipes.hide();
+						$(recipes[idx]).show();
 					};
 
 					items.each(function(idx, item) {
-						$(item).mouseover(function() {
-							focusItem(idx);
-						});
+						if (is_touch_device) {
+							$('a', item).click(function(event) {
+								event.preventDefault();
+								focusItem(idx);
+							});
+						} else {
+							$(item).mouseover(function() {
+								focusItem(idx);
+							});
+						}
 					});
 
 					focusItem(0);
@@ -159,6 +168,7 @@ $(function() {
 	});
 
 	viewport.on('mousemove', updateHistory);
+	viewport.on('touchstart', updateHistory);
 	viewport.on('popstate', populateForm);
 
 	prepareField(initial_field);

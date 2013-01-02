@@ -24,7 +24,7 @@ RECIPE_TEMPLATE = '''\
 	<div class="picture">
 		%(picture)s
 	</div>
-	<div class="details">
+	<div>
 		<h2><a href="%(url)s">%(title)s</a></h2>
 		<ul>
 			%(ingredients)s
@@ -130,7 +130,7 @@ class CocktailsApp(object):
 							escape(attrs['url']),
 							escape(attrs['picture']),
 							escape(attrs['title']),
-						) if attrs['picture'] else '&nbsp;',
+						) if attrs['picture'] else '<span></span>',
 						'ingredients': ''.join(
 							'<li>%s</li>' % escape(s) for s in attrs['ingredients_text'].splitlines()
 						),

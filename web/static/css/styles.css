@@ -1,16 +1,23 @@
 * {
 	font-family: 'Donegal One', serif !important;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
 h2, h2 a, h2 a:hover {
 	font-size: 1.2em;
 	line-height: 1.3em;
-	margin-top: 0;
+	margin-top: 2px;
 	color: #333;
 }
 
 body > * {
-	padding: 20px;
+	padding: 1em;
+}
+
+form {
+	margin: 0;
 }
 
 .nav-pills > .active > a,
@@ -23,8 +30,13 @@ body > * {
 	top: 0;
 	bottom: 0;
 	left: 0;
-	width: 228px;
+	width: 260px;
 	overflow: auto;
+}
+
+#ingredients input {
+	width: 100%;
+	height: auto;
 }
 
 #cocktails {
@@ -32,9 +44,8 @@ body > * {
 }
 
 .cocktail {
-	width: 100%;
 	overflow: auto;
-	padding-bottom: 30px;
+	padding-bottom: 2em;
 	position: relative;
 }
 
@@ -45,13 +56,15 @@ body > * {
 .cocktail .nav-pills {
 	position: absolute;
 	top: 0;
-	left: 400px;
+	left: 420px;
 }
 
 .cocktail .nav-pills > li > a {
-	padding-top: 0;
-	padding-bottom: 0;
+	padding-top: 2px;
+	padding-bottom: 2px;
 	margin-top: 0;
+	margin-right: 0;
+	margin-bottom: 0.8em;
 }
 
 .cocktail .nav-pills > li > a > span {
@@ -71,40 +84,67 @@ body > * {
 .cocktail .nav-pills > .active > a[href^="http://www.esquire.com/"]     > span { background-position: -24px -72px; }
 
 .recipe {
-	width: 640px;
-	overflow: auto;
+	display: table;
 }
 
 .recipe > * {
-	float: left;
+	display: table-cell;
+	vertical-align: top;
+	padding-right: 1em;
 }
-
 
 .recipe h2 {
 	width: 250px;
 }
 
-.picture {
-	margin-right: 20px;
-}
-
-.picture, .picture img {
-	width: 120px;
-}
-
-.details {
-	width: 500px;
-}
-
-.details li {
+.recipe li {
 	list-style-type: none;
 	text-indent: -1.5em;
 	font-size: 1.1em;
 	line-height: 1.5em;
 }
 
-.github-ribbon {
+.picture > * {
+	width: 140px;
+	display: inline-block;
+}
+
+#github-ribbon {
 	position: fixed;
 	top: 0;
 	right: 0;
+}
+
+@media (max-width: 1000px) {
+	#ingredients {
+		position: static;
+		width: auto;
+	}
+
+	#cocktails {
+		margin-left: 0;
+	}
+
+	.cocktail .nav-pills {
+		position: static;
+		float: right;
+	}
+
+	.cocktail .nav-pills > li {
+		float: none;
+	}
+
+	.recipe h2 {
+		width: auto;
+	}
+
+	#github-ribbon {
+		display: none;
+	}
+}
+
+@media (max-width: 500px) {
+	.picture {
+		display: none;
+	}
 }
