@@ -12,6 +12,10 @@ h2, h2 a, h2 a:hover {
 	color: #333;
 }
 
+body {
+	overflow-y: scroll;
+}
+
 body > * {
 	padding: 1em;
 }
