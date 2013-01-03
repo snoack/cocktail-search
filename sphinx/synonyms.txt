@@ -9,3 +9,5 @@ kahlua > coffee liqueur
 kahlúa > coffee liqueur
 espresso > coffee
 ginger beer > ginger
+cointreau > triple sec
+triple sec > orange curacao

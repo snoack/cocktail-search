@@ -47,14 +47,14 @@ def compile_synonyms():
 	synonyms = load_synonyms()
 	regex = re.compile(r'\b(?:%s)\b' % '|'.join(imap(re.escape, synonyms)), re.I)
 
-	return (
-		lambda s: regex.sub((
-			lambda m: (
-				lambda term:
-					' '.join([term] + synonyms[term.lower()])
-			)(m.group(0))
-		), s)
-	)
+	def expand(s):
+		yield s
+
+		for x in synonyms.get(s.lower(), []):
+			for y in expand(x):
+				yield y
+
+	return (lambda s: regex.sub(lambda m : ' '.join(expand(m.group(0))), s))
 
 expand_synonyms = compile_synonyms()
 
