@@ -86,6 +86,8 @@ form {
 .cocktail .nav-pills > .active > a[href^="http://en.wikipedia.org/"]    > span { background-position: -24px -48px; }
 .cocktail .nav-pills > li      > a[href^="http://www.esquire.com/"]     > span { background-position:   0   -72px; }
 .cocktail .nav-pills > .active > a[href^="http://www.esquire.com/"]     > span { background-position: -24px -72px; }
+.cocktail .nav-pills > li      > a[href^="http://www.cocktaildb.com/"]  > span { background-position:   0   -96px; }
+.cocktail .nav-pills > .active > a[href^="http://www.cocktaildb.com/"]  > span { background-position: -24px -96px; }
 
 .recipe {
 	display: table;

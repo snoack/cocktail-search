@@ -17,7 +17,7 @@ stemmer = Stemmer('english')
 def normalize_title(s):
 	s = re.sub(r'[^\w\s]', '', normalize('NFKD', s)).lower()
 	s = ' '.join(stemmer.stemWords(s.split()))
-	s = re.match('(?:the )?(.*?)(?: cocktail)?(?: for a crowd)?$', s).group(1)
+	s = re.match('(?:the )?(?:dri )?(?:rye (?=sazerac))?(.*?)(?: cocktail)?(?: for a crowd)?(?: dri)?(?: the)?$', s).group(1)
 	s = s.replace(' ', '')
 
 	return s
