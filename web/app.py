@@ -37,18 +37,31 @@ class CocktailsApp(object):
 		Rule('/recipes', endpoint='recipes'),
 	])
 
-	def query(self, sphinx, ingredients, offset):
-		query = '@ingredients ' + ' | '.join(
-			'(%s)' % ' SENTENCE '.join(
+	def make_query(self, sphinx, ingredients):
+		queries = []
+
+		for ingredient in ingredients:
+			m = re.match(r'(\w+)\s*:\s*(\S.*)', ingredient)
+
+			if m:
+				field, ingredient = m.groups()
+			else:
+				field = 'ingredients'
+
+			queries.append('@%s (%s)' % (field, ' SENTENCE '.join(
 				'"%s"' % sphinx.EscapeString(word)
-					for quoted, unquoted in re.findall(r'"(.*?)(?:"|$)|([^"]+)', s)
+					for quoted, unquoted in re.findall(r'"(.*?)(?:"|$)|([^"]+)', ingredient)
 					for word in (quoted and [quoted] or [
 						kw['tokenized'] for kw in sphinx.BuildKeywords(
 							unquoted.encode('utf-8'), 'recipes', 0
 						)
 					])
-			) for s in ingredients
-		)
+			)))
+
+		return ' | '.join(queries)
+
+	def query(self, sphinx, ingredients, offset):
+		query = self.make_query(sphinx, ingredients)
 
 		sphinx.SetMatchMode(sphinxapi.SPH_MATCH_EXTENDED2)
 		sphinx.SetRankingMode(sphinxapi.SPH_RANK_MATCHANY)
