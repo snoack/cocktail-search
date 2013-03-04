@@ -2,7 +2,8 @@ bourbon > whiskey
 rye > whiskey
 scotch > whiskey
 cognac > brandy
-calvados > brandy
+calvados > apple brandy
+applejack > apple brandy
 angostura > bitters
 peychaud > bitters
 kahlua > coffee liqueur
