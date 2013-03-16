@@ -94,6 +94,8 @@ form {
 .cocktail .nav-pills > .active > a[href^="http://ohgo.sh/"]               > span { background-position: -24px -144px; }
 .cocktail .nav-pills > li      > a[href^="http://www.cocktailtimes.com/"] > span { background-position:   0   -168px; }
 .cocktail .nav-pills > .active > a[href^="http://www.cocktailtimes.com/"] > span { background-position: -24px -168px; }
+.cocktail .nav-pills > li      > a[href^="http://www.drinksmixer.com/"]   > span { background-position:   0   -192px; }
+.cocktail .nav-pills > .active > a[href^="http://www.drinksmixer.com/"]   > span { background-position: -24px -192px; }
 
 .recipe {
 	display: table;
