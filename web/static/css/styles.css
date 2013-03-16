@@ -90,6 +90,8 @@ form {
 .cocktail .nav-pills > .active > a[href^="http://www.cocktaildb.com/"]  > span { background-position: -24px -96px; }
 .cocktail .nav-pills > li      > a[href^="http://www.drinkboy.com/"]    > span { background-position:   0   -120px; }
 .cocktail .nav-pills > .active > a[href^="http://www.drinkboy.com/"]    > span { background-position: -24px -120px; }
+.cocktail .nav-pills > li      > a[href^="http://ohgo.sh/"]             > span { background-position:   0   -144px; }
+.cocktail .nav-pills > .active > a[href^="http://ohgo.sh/"]             > span { background-position: -24px -144px; }
 
 .recipe {
 	display: table;

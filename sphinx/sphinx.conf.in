@@ -6,6 +6,7 @@ source recipes {
 		-i $DIRNAME/../crawler/esquire.json \
 		-u $DIRNAME/../crawler/wikipedia.json \
 		-i $DIRNAME/../crawler/drinkboy.json \
+		-i $DIRNAME/../crawler/ohgosh.json \
 		-i $DIRNAME/../crawler/cocktaildb.json
 }
 
