@@ -42,26 +42,35 @@ class CocktailsApp(object):
 
 		for ingredient in ingredients:
 			m = re.match(r'(\w+)\s*:\s*(\S.*)', ingredient)
-
 			if m:
 				field, ingredient = m.groups()
 			else:
 				field = 'ingredients'
 
-			queries.append('@%s (%s)' % (field, ' SENTENCE '.join(
-				'"%s"' % sphinx.EscapeString(word)
-					for quoted, unquoted in re.findall(r'"(.*?)(?:"|$)|([^"]+)', ingredient)
-					for word in (quoted and [quoted] or [
-						kw['tokenized'] for kw in sphinx.BuildKeywords(
-							unquoted.encode('utf-8'), 'recipes', 0
-						)
-					])
-			)))
+			words = []
+			for quoted, unquoted in re.findall(r'"(.*?)(?:"|$)|([^"]+)', ingredient):
+				if quoted:
+					words.extend(quoted)
+				if unquoted:
+					keywords = sphinx.BuildKeywords(unquoted.encode('utf-8'), 'recipes', 0)
+					if keywords is None:
+						return None
+					for kw in keywords:
+						words.append(kw['tokenized'])
+
+			queries.append('@%s (%s)' % (
+				field,
+				' SENTENCE '.join(
+					'"%s"' % sphinx.EscapeString(word) for word in words
+				)
+			))
 
 		return ' | '.join(queries)
 
 	def query(self, sphinx, ingredients, offset):
 		query = self.make_query(sphinx, ingredients)
+		if query is None:
+			return None
 
 		sphinx.SetMatchMode(sphinxapi.SPH_MATCH_EXTENDED2)
 		sphinx.SetRankingMode(sphinxapi.SPH_RANK_MATCHANY)
