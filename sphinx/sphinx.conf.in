@@ -3,6 +3,7 @@ source recipes {
 	xmlpipe_command = $DIRNAME/xmlpipe.py \
 		-i $DIRNAME/../crawler/seriouseats.json \
 		-i $DIRNAME/../crawler/liquor.json \
+		-i $DIRNAME/../crawler/saveur.json \
 		-i $DIRNAME/../crawler/cocktailtimes.json \
 		-u $DIRNAME/../crawler/wikipedia.json \
 		-i $DIRNAME/../crawler/drinkboy.json \

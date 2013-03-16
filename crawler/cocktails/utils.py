@@ -1,5 +1,8 @@
 import re
 from HTMLParser import HTMLParser
+from collections import OrderedDict
+
+from scrapy.selector import XPathSelector
 
 unescape = HTMLParser().unescape
 
@@ -32,3 +35,31 @@ def split_at_br(hxs):
 
 		if not node:
 			return rv
+
+def extract_extra_ingredients(nodes, is_section_header):
+	section = None
+	sections = OrderedDict()
+
+	for node in nodes:
+		text = node.extract() if isinstance(node, XPathSelector) else node
+		text = html_to_text(text).strip()
+
+		if not text:
+			continue
+
+		if is_section_header(node):
+			section = text
+			continue
+
+		sections.setdefault(section, []).append(text)
+
+	if None in sections:
+		ingredients = sections.pop(None)
+	elif sections:
+		ingredients = sections.pop(sections.keys()[-1])
+	else:
+		ingredients = []
+
+	extra_ingredients = [x for y in sections.values() for x in y]
+
+	return (ingredients, extra_ingredients)

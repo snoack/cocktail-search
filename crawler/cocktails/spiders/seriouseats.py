@@ -1,6 +1,5 @@
 import json
 from functools import partial
-from collections import OrderedDict
 
 from scrapy.spider import BaseSpider
 from scrapy.http import Request
@@ -9,7 +8,7 @@ from scrapy.selector import HtmlXPathSelector
 from lxml.cssselect import css_to_xpath
 
 from cocktails.items import CocktailItem
-from cocktails.utils import html_to_text
+from cocktails.utils import extract_extra_ingredients
 
 URL = 'http://www.seriouseats.com/topics/search?index=recipe&count=200&term=c|cocktails'
 
@@ -46,23 +45,10 @@ class SeriouseatsSpider(BaseSpider):
 	def parse_recipe(self, response, title, picture):
 		hxs = HtmlXPathSelector(response)
 
-		section = None
-		sections = OrderedDict()
-
-		for node in hxs.select(xp_ingredients):
-			text = html_to_text(node.extract()).strip()
-
-			if not text:
-				continue
-
-			if node.select('strong'):
-				section = text
-				continue
-
-			sections.setdefault(section, []).append(text)
-
-		ingredients = sections.pop(None, None) or sections.pop(sections.keys()[-1])
-		extra_ingredients = [x for y in sections.values() for x in y]
+		ingredients, extra_ingredients = extract_extra_ingredients(
+			hxs.select(xp_ingredients),
+			lambda node: node.select('strong')
+		)
 
 		yield CocktailItem(
 			title=title,
