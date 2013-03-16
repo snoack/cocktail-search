@@ -78,20 +78,22 @@ form {
 	background: url(../img/sources.png);
 }
 
-.cocktail .nav-pills > li      > a[href^="http://liquor.com/"]          > span { background-position:   0     0;   }
-.cocktail .nav-pills > .active > a[href^="http://liquor.com/"]          > span { background-position: -24px   0;   }
-.cocktail .nav-pills > li      > a[href^="http://www.seriouseats.com/"] > span { background-position:   0   -24px; }
-.cocktail .nav-pills > .active > a[href^="http://www.seriouseats.com/"] > span { background-position: -24px -24px; }
-.cocktail .nav-pills > li      > a[href^="http://en.wikipedia.org/"]    > span { background-position:   0   -48px; }
-.cocktail .nav-pills > .active > a[href^="http://en.wikipedia.org/"]    > span { background-position: -24px -48px; }
-.cocktail .nav-pills > li      > a[href^="http://www.esquire.com/"]     > span { background-position:   0   -72px; }
-.cocktail .nav-pills > .active > a[href^="http://www.esquire.com/"]     > span { background-position: -24px -72px; }
-.cocktail .nav-pills > li      > a[href^="http://www.cocktaildb.com/"]  > span { background-position:   0   -96px; }
-.cocktail .nav-pills > .active > a[href^="http://www.cocktaildb.com/"]  > span { background-position: -24px -96px; }
-.cocktail .nav-pills > li      > a[href^="http://www.drinkboy.com/"]    > span { background-position:   0   -120px; }
-.cocktail .nav-pills > .active > a[href^="http://www.drinkboy.com/"]    > span { background-position: -24px -120px; }
-.cocktail .nav-pills > li      > a[href^="http://ohgo.sh/"]             > span { background-position:   0   -144px; }
-.cocktail .nav-pills > .active > a[href^="http://ohgo.sh/"]             > span { background-position: -24px -144px; }
+.cocktail .nav-pills > li      > a[href^="http://liquor.com/"]            > span { background-position:   0     0;   }
+.cocktail .nav-pills > .active > a[href^="http://liquor.com/"]            > span { background-position: -24px   0;   }
+.cocktail .nav-pills > li      > a[href^="http://www.seriouseats.com/"]   > span { background-position:   0   -24px; }
+.cocktail .nav-pills > .active > a[href^="http://www.seriouseats.com/"]   > span { background-position: -24px -24px; }
+.cocktail .nav-pills > li      > a[href^="http://en.wikipedia.org/"]      > span { background-position:   0   -48px; }
+.cocktail .nav-pills > .active > a[href^="http://en.wikipedia.org/"]      > span { background-position: -24px -48px; }
+.cocktail .nav-pills > li      > a[href^="http://www.esquire.com/"]       > span { background-position:   0   -72px; }
+.cocktail .nav-pills > .active > a[href^="http://www.esquire.com/"]       > span { background-position: -24px -72px; }
+.cocktail .nav-pills > li      > a[href^="http://www.cocktaildb.com/"]    > span { background-position:   0   -96px; }
+.cocktail .nav-pills > .active > a[href^="http://www.cocktaildb.com/"]    > span { background-position: -24px -96px; }
+.cocktail .nav-pills > li      > a[href^="http://www.drinkboy.com/"]      > span { background-position:   0   -120px; }
+.cocktail .nav-pills > .active > a[href^="http://www.drinkboy.com/"]      > span { background-position: -24px -120px; }
+.cocktail .nav-pills > li      > a[href^="http://ohgo.sh/"]               > span { background-position:   0   -144px; }
+.cocktail .nav-pills > .active > a[href^="http://ohgo.sh/"]               > span { background-position: -24px -144px; }
+.cocktail .nav-pills > li      > a[href^="http://www.cocktailtimes.com/"] > span { background-position:   0   -168px; }
+.cocktail .nav-pills > .active > a[href^="http://www.cocktailtimes.com/"] > span { background-position: -24px -168px; }
 
 .recipe {
 	display: table;
