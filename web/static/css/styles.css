@@ -96,6 +96,8 @@ form {
 .cocktail .nav-pills > .active > a[href^="http://www.cocktailtimes.com/"] > span { background-position: -24px -168px; }
 .cocktail .nav-pills > li      > a[href^="http://www.drinksmixer.com/"]   > span { background-position:   0   -192px; }
 .cocktail .nav-pills > .active > a[href^="http://www.drinksmixer.com/"]   > span { background-position: -24px -192px; }
+.cocktail .nav-pills > li      > a[href^="http://www.monkey47.com/"]      > span { background-position:   0   -216px; }
+.cocktail .nav-pills > .active > a[href^="http://www.monkey47.com/"]      > span { background-position: -24px -216px; }
 
 .recipe {
 	display: table;

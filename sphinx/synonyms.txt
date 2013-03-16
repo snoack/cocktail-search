@@ -12,3 +12,4 @@ espresso > coffee
 ginger beer > ginger
 cointreau > triple sec
 triple sec > orange curacao
+monkey 47 > gin

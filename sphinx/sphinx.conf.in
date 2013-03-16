@@ -8,6 +8,7 @@ source recipes {
 		-i $DIRNAME/../crawler/drinkboy.json \
 		-i $DIRNAME/../crawler/ohgosh.json \
 		-i $DIRNAME/../crawler/esquire.json \
+		-i $DIRNAME/../crawler/monkey47.json \
 		-i $DIRNAME/../crawler/drinksmixer.json \
 		-i $DIRNAME/../crawler/cocktaildb.json
 }
