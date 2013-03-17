@@ -1,7 +1,5 @@
 $(function() {
-	var is_touch_device = 'ontouchstart' in document.documentElement;
-
-	var cocktails = $('#cocktails');
+	var results = $('#search-results');
 	var form = $('form');
 	var viewport = $(window);
 
@@ -27,32 +25,30 @@ $(function() {
 				callback(elements, n);
 				can_load_more = n > 1;
 
-				$($('.cocktail').slice(-n)).each(function(idx, cocktail) {
-					var items = $('.nav-pills > li', cocktail);
+				$($('.cocktail').slice(-n)).each(function(_, cocktail) {
 					var recipes = $('.recipe', cocktail);
 
-					var focusItem = function(idx) {
-						items.removeClass('active');
-						$(items[idx]).addClass('active');
+					recipes.each(function(_, recipe) {
+						$('.sources a', recipe).each(function(idx, source) {
+							$(source).click(function(event) {
+								var scrollOffset = $('body').scrollTop();
+								var recipe = $(recipes[idx]);
 
-						recipes.hide();
-						$(recipes[idx]).show();
-					};
+								recipes.each(function(_, recipe) {
+									recipe = $(recipe);
 
-					items.each(function(idx, item) {
-						if (is_touch_device) {
-							$('a', item).click(function(event) {
-								event.preventDefault();
-								focusItem(idx);
+									if (recipe.hasClass('active')) {
+										scrollOffset -= $('.sources', recipe)[0].offsetTop;
+										recipe.removeClass('active');
+									}
+								});
+
+								recipe.addClass('active');
+								scrollOffset += $('.sources', recipe)[0].offsetTop;
+								viewport.scrollTop(scrollOffset);
 							});
-						} else {
-							$(item).mouseover(function() {
-								focusItem(idx);
-							});
-						}
+						});
 					});
-
-					focusItem(0);
 				});
 			}
 		});
@@ -62,7 +58,7 @@ $(function() {
 		offset = 0;
 
 		load(function(elements, n) {
-			cocktails.html(elements);
+			results.html(elements);
 			window.scrollTo(0, 0);
 			offset = n;
 		});
@@ -70,7 +66,7 @@ $(function() {
 
 	var loadMore = function() {
 		load(function(elements, n) {
-			cocktails.append(elements);
+			results.append(elements);
 			offset += n;
 		});
 	};

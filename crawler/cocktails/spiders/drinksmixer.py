@@ -36,5 +36,6 @@ class DrinksMixerSpider(CrawlSpider):
 			title=re.sub(r'\s+recipe$', '', html_to_text(title)),
 			picture=None,
 			url=response.url,
+			source='Drinks Mixer',
 			ingredients=map(html_to_text, ingredients),
 		)]

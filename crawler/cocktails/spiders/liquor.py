@@ -37,5 +37,6 @@ class LiqourSpider(CrawlSpider):
 			title=html_to_text(title),
 			picture=picture,
 			url=response.url,
+			source='Liquor.com',
 			ingredients=map(html_to_text, ingredients),
 		)]

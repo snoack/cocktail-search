@@ -54,5 +54,6 @@ class WikipediaSpider(CrawlSpider):
 				title=html_to_text(title),
 				picture=picture,
 				url=response.url,
+				source='Wikipedia',
 				ingredients=map(html_to_text, ingredients)
 			)

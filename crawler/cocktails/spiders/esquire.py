@@ -57,5 +57,6 @@ class EsquireSpider(SitemapSpider):
 			title=unescape(title),
 			picture=picture,
 			url=response.url,
+			source='Esquire',
 			ingredients=ingredients
 		)]

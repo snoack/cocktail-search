@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import re
+from collections import OrderedDict
 import sphinxapi
 
 from werkzeug.wrappers import Request, Response
@@ -20,15 +21,20 @@ SPHINX_HOST = getattr(settings, 'SPHINX_HOST', 'localhost')
 SPHINX_PORT = getattr(settings, 'SPHINX_PORT', 9312)
 
 RECIPE_TEMPLATE = '''\
-<div class="recipe">
+<div class="recipe%(extra_css)s">
 	<div class="picture">
 		%(picture)s
 	</div>
-	<div>
+	<div class="details">
 		<h2><a href="%(url)s">%(title)s</a></h2>
-		<ul>
-			%(ingredients)s
-		</ul>
+		<div class="ingredients-and-sources">
+			<ul class="ingredients">
+				%(ingredients)s
+			</ul>
+			<div class="sources">
+				%(sources)s
+			</div>
+		</div>
 	</div>
 </div>'''
 
@@ -133,30 +139,43 @@ class CocktailsApp(object):
 		else:
 			for recipes in cocktails:
 				output.append('<div class="cocktail">')
-				output.append('<ul class="nav nav-pills">')
 
+				sources = OrderedDict()
 				for recipe in recipes:
-					output.append('<li><a href="')
-					output.append(escape(recipe['attrs']['url']))
-					output.append('"><span></span></a></li>')
+					sources.setdefault(recipe['attrs']['source'], []).append(recipe)
 
-				output.append('</ul>')
+				is_first = True
+				for source, recipes in sources.iteritems():
+					for recipe in recipes:
+						attrs = recipe['attrs']
 
-				for recipe in recipes:
-					attrs = recipe['attrs']
+						output.append(RECIPE_TEMPLATE % {
+							'title': escape(attrs['title']),
+							'url': escape(attrs['url']),
+							'picture': '<a href="%s"><img src="%s" alt="%s"/></a>' % (
+								escape(attrs['url']),
+								escape(attrs['picture']),
+								escape(attrs['title']),
+							) if attrs['picture'] else '<span></span>',
+							'ingredients': ''.join(
+								'<li>%s</li>' % escape(s) for s in attrs['ingredients_text'].splitlines()
+							),
+							'sources': '<h3>Source</h3><ul>%s</ul>' % ''.join(
+								'<li>%s</li>' % ' '.join(
+									'<a %s>%s</a>' % (
+										'class="active"' if recipe is other_recipe else 'href="javascript:void(0)"',
+										label
+									) for other_recipe, label in zip(other_recipes, [
+										other_source
+									] + [
+										'(%d)' % (i + 1) for i in xrange(1, len(other_recipes))
+									])
+								) for other_source, other_recipes in sources.iteritems()
+							),
+							'extra_css': ' active' if is_first else '',
+						})
 
-					output.append(RECIPE_TEMPLATE % {
-						'title': escape(attrs['title']),
-						'url': escape(attrs['url']),
-						'picture': '<a href="%s"><img src="%s" alt="%s"/></a>' % (
-							escape(attrs['url']),
-							escape(attrs['picture']),
-							escape(attrs['title']),
-						) if attrs['picture'] else '<span></span>',
-						'ingredients': ''.join(
-							'<li>%s</li>' % escape(s) for s in attrs['ingredients_text'].splitlines()
-						),
-					})
+						is_first = False
 
 				output.append('</div>')
 

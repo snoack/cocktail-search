@@ -67,6 +67,7 @@ def xmlpipe():
 	print '<sphinx:field name="title_normalized" attr="string"/>'
 	print '<sphinx:field name="ingredients"/>'
 	print '<sphinx:attr name="url" type="string"/>'
+	print '<sphinx:attr name="source" type="string"/>'
 	print '<sphinx:attr name="picture" type="string"/>'
 	print '<sphinx:attr name="ingredients_text" type="string"/>'
 	print '</sphinx:schema>'
@@ -93,6 +94,7 @@ def xmlpipe():
 				print '<sphinx:document id="%d">' % i
 				print '<title>%s</title>' % ee(item['title'])
 				print '<url>%s</url>' % ee(item['url'])
+				print '<source>%s</source>' % ee(item['source'])
 
 				if item['picture']:
 					print '<picture>%s</picture>' % ee(item['picture'])

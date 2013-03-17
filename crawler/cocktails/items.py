@@ -4,6 +4,7 @@ class CocktailItem(Item):
 	title = Field()
 	picture = Field()
 	url = Field()
+	source = Field()
 	ingredients = Field()
 
 	# will be indexed too, but not shown in the list. Primary for

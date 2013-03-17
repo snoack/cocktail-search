@@ -71,6 +71,7 @@ class SaveurSpider(BaseSpider):
 			title=html_to_text(title).strip(),
 			picture=picture,
 			url=response.url,
+			source='Saveur',
 			ingredients=ingredients,
 			extra_ingredients=extra_ingredients
 		)]

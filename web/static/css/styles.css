@@ -5,10 +5,20 @@
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
-h2, h2 a, h2 a:hover {
-	font-size: 1.2em;
+h2 {
+	font-size: 1.4em;
 	line-height: 1.3em;
-	margin-top: 2px;
+	margin-top: 0;
+}
+
+h3 {
+	font-size: 1.2em;
+	line-height: 1.4em;
+	margin-top: 0;
+	margin-bottom: 5px;
+}
+
+a, a:hover, a:active {
 	color: #333;
 }
 
@@ -24,12 +34,12 @@ form {
 	margin: 0;
 }
 
-.nav-pills > .active > a,
-.nav-pills > .active > a:hover {
-	background-color: #333;
+li {
+	list-style-type: none;
+	text-indent: -24px;
 }
 
-#ingredients {
+#search-form {
 	position: fixed;
 	top: 0;
 	bottom: 0;
@@ -38,13 +48,13 @@ form {
 	overflow: auto;
 }
 
-#ingredients input {
+#search-form input {
 	width: 100%;
 	height: auto;
 }
 
-#cocktails {
-	margin-left: 260px;
+#search-results {
+	margin-left: 255px;
 }
 
 .cocktail {
@@ -57,69 +67,20 @@ form {
 	padding-bottom: 0;
 }
 
-.cocktail .nav-pills {
-	position: absolute;
-	top: 0;
-	left: 420px;
-}
-
-.cocktail .nav-pills > li > a {
-	padding-top: 2px;
-	padding-bottom: 2px;
-	margin-top: 0;
-	margin-right: 0;
-	margin-bottom: 0.8em;
-}
-
-.cocktail .nav-pills > li > a > span {
-	display: inline-block;
-	width: 24px;
-	height: 24px;
-	background: url(../img/sources.png);
-}
-
-.cocktail .nav-pills > li      > a[href^="http://liquor.com/"]            > span { background-position:   0     0;   }
-.cocktail .nav-pills > .active > a[href^="http://liquor.com/"]            > span { background-position: -24px   0;   }
-.cocktail .nav-pills > li      > a[href^="http://www.seriouseats.com/"]   > span { background-position:   0   -24px; }
-.cocktail .nav-pills > .active > a[href^="http://www.seriouseats.com/"]   > span { background-position: -24px -24px; }
-.cocktail .nav-pills > li      > a[href^="http://en.wikipedia.org/"]      > span { background-position:   0   -48px; }
-.cocktail .nav-pills > .active > a[href^="http://en.wikipedia.org/"]      > span { background-position: -24px -48px; }
-.cocktail .nav-pills > li      > a[href^="http://www.esquire.com/"]       > span { background-position:   0   -72px; }
-.cocktail .nav-pills > .active > a[href^="http://www.esquire.com/"]       > span { background-position: -24px -72px; }
-.cocktail .nav-pills > li      > a[href^="http://www.cocktaildb.com/"]    > span { background-position:   0   -96px; }
-.cocktail .nav-pills > .active > a[href^="http://www.cocktaildb.com/"]    > span { background-position: -24px -96px; }
-.cocktail .nav-pills > li      > a[href^="http://www.drinkboy.com/"]      > span { background-position:   0   -120px; }
-.cocktail .nav-pills > .active > a[href^="http://www.drinkboy.com/"]      > span { background-position: -24px -120px; }
-.cocktail .nav-pills > li      > a[href^="http://ohgo.sh/"]               > span { background-position:   0   -144px; }
-.cocktail .nav-pills > .active > a[href^="http://ohgo.sh/"]               > span { background-position: -24px -144px; }
-.cocktail .nav-pills > li      > a[href^="http://www.cocktailtimes.com/"] > span { background-position:   0   -168px; }
-.cocktail .nav-pills > .active > a[href^="http://www.cocktailtimes.com/"] > span { background-position: -24px -168px; }
-.cocktail .nav-pills > li      > a[href^="http://www.drinksmixer.com/"]   > span { background-position:   0   -192px; }
-.cocktail .nav-pills > .active > a[href^="http://www.drinksmixer.com/"]   > span { background-position: -24px -192px; }
-.cocktail .nav-pills > li      > a[href^="http://www.monkey47.com/"]      > span { background-position:   0   -216px; }
-.cocktail .nav-pills > .active > a[href^="http://www.monkey47.com/"]      > span { background-position: -24px -216px; }
-.cocktail .nav-pills > li      > a[href^="http://www.saveur.com/"]        > span { background-position:   0   -240px; }
-.cocktail .nav-pills > .active > a[href^="http://www.saveur.com/"]        > span { background-position: -24px -240px; }
-
 .recipe {
-	display: table;
+	display: -webkit-box;
+	display: -moz-box;
+	display: box;
+	width: 700px;
+	padding-left: 5px;
 }
 
-.recipe > * {
-	display: table-cell;
-	vertical-align: top;
+.recipe:not(.active) {
+	display: none;
+}
+
+.picture {
 	padding-right: 1em;
-}
-
-.recipe h2 {
-	width: 250px;
-}
-
-.recipe li {
-	list-style-type: none;
-	text-indent: -1.5em;
-	font-size: 1.1em;
-	line-height: 1.5em;
 }
 
 .picture > * {
@@ -127,6 +88,52 @@ form {
 	display: inline-block;
 }
 
+.details {
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+	box-flex: 1;
+}
+
+.ingredients-and-sources {
+	display: -webkit-box;
+	display: -moz-box;
+	display: box;
+	width: 100%;
+}
+
+.ingredients {
+	margin-right: 1em;
+	-webkit-box-flex: 1;
+	-moz-box-flex: 1;
+	box-flex: 1;
+}
+
+.ingredients li {
+	font-size: 1.1em;
+	line-height: 1.5em;
+}
+
+.sources {
+	width: 130px;
+}
+
+.sources li {
+	font-size: 0.9em;
+	line-height: 1.8em;
+}
+
+.sources a {
+	margin-left: -5px;
+	padding: 2px 5px;
+	border-radius: 7px;
+}
+
+.sources a.active,
+.sources a.active:hover {
+	background-color: #333;
+	color: #fff;
+	text-decoration: none;
+}
 #github-ribbon {
 	position: fixed;
 	top: 0;
@@ -134,35 +141,32 @@ form {
 }
 
 @media (max-width: 1000px) {
-	#ingredients {
+	#search-form {
 		position: static;
 		width: auto;
 	}
 
-	#cocktails {
-		margin-left: 0;
-	}
-
-	.cocktail .nav-pills {
-		position: static;
-		float: right;
-	}
-
-	.cocktail .nav-pills > li {
-		float: none;
-	}
-
-	.recipe h2 {
-		width: auto;
+	#search-results {
+		margin-left: -5px;
 	}
 
 	#github-ribbon {
 		display: none;
 	}
+
+	.recipe {
+		width: 100%;
+	}
 }
 
-@media (max-width: 500px) {
+@media (max-width: 580px) {
 	.picture {
 		display: none;
+	}
+
+	.ingredients-and-sources {
+		-webkit-box-orient: vertical;
+		-moz-box-orient: vertical;
+		box-orient: vertical;
 	}
 }

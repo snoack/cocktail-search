@@ -43,5 +43,6 @@ class Monkey47Spider(BaseSpider):
 			title=html_to_text(title).split(':')[-1].split(u'\u2013')[-1].strip(),
 			picture=None,
 			url=response.url,
+			source='Monkey 47 Blog',
 			ingredients=ingredients
 		)]

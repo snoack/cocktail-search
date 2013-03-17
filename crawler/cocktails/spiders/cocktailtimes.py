@@ -73,5 +73,6 @@ class CocktailTimesSpider(CrawlSpider):
 			title=html_to_text(title),
 			picture=picture,
 			url=response.url,
+			source='Cocktail Times',
 			ingredients=ingredients,
 		)]

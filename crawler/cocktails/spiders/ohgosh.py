@@ -48,5 +48,6 @@ class OhGoshSpider(BaseSpider):
 				title=html_to_text(node.extract()),
 				picture=picture,
 				url=url,
+				source='Oh Gosh!',
 				ingredients=map(html_to_text, ingredients),
 			)

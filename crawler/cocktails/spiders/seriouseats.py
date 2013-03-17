@@ -54,6 +54,7 @@ class SeriouseatsSpider(BaseSpider):
 			title=title,
 			picture=picture,
 			url=response.url,
+			source='Serious Eats',
 			ingredients=ingredients,
 			extra_ingredients=extra_ingredients
 		)

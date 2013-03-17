@@ -40,5 +40,6 @@ class DrinkBoySpider(CrawlSpider):
 			title=html_to_text(title),
 			picture=picture,
 			url=response.url,
+			source='DrinkBoy',
 			ingredients=map(html_to_text, ingredients),
 		)]
