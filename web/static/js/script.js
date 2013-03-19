@@ -9,9 +9,10 @@ $(function() {
 
 	var offset = 0;
 	var can_load_more = false;
-
 	var ingredients;
+
 	var state;
+	var state_is_volatile;
 
 	var load = function(callback) {
 		can_load_more = false;
@@ -59,8 +60,10 @@ $(function() {
 
 		load(function(elements, n) {
 			results.html(elements);
-			window.scrollTo(0, 0);
 			offset = n;
+
+			window.scrollTo(0, 0);
+			setTimeout(function() { state_is_volatile = true; }, 0);
 		});
 	};
 
@@ -78,13 +81,6 @@ $(function() {
 			title += ': ' + ingredients.join(', ');
 
 		document.title = title;
-	};
-
-	var updateHistory = function() {
-		if (state != document.location.hash) {
-			history.pushState(null, null, state || '.');
-			updateTitle();
-		}
 	};
 
 	var prepareField = function(field) {
@@ -107,15 +103,24 @@ $(function() {
 			if (!has_empty)
 				addField();
 
-			if (new_state != state) {
-				state = new_state;
-				loadInitial();
-			}
+			if (new_state == state)
+				return;
+
+			history[
+				state_is_volatile
+					? 'replaceState'
+					: 'pushState'
+			](null, null, new_state || '.');
+
+			state = new_state;
+			state_is_volatile = true;
+
+			updateTitle();
+			loadInitial();
 		});
 
 		field.blur(function() {
 			$('input[value=]', form).slice(0, -1).remove();
-			updateHistory();
 		});
 	};
 
@@ -130,6 +135,7 @@ $(function() {
 
 	var populateForm = function() {
 		state = document.location.hash;
+		state_is_volatile = false;
 		ingredients = [];
 
 		var bits = state.substring(1).split(';');
@@ -161,7 +167,13 @@ $(function() {
 		loadInitial();
 	};
 
+	results.mousedown(function() {
+		state_is_volatile = false;
+	});
+
 	viewport.scroll(function() {
+		state_is_volatile = false;
+
 		if (!can_load_more)
 			return;
 		if (viewport.scrollTop() + viewport.height() < $('.cocktail').slice(-5)[0].offsetTop)
@@ -170,8 +182,6 @@ $(function() {
 		loadMore();
 	});
 
-	viewport.on('mousemove', updateHistory);
-	viewport.on('touchstart', updateHistory);
 	viewport.on('popstate', populateForm);
 
 	prepareField(initial_field);
