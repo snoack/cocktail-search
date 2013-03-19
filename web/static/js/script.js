@@ -133,6 +133,7 @@ $(function() {
 		ingredients = [];
 
 		var bits = state.substring(1).split(';');
+		var field;
 
 		$('input', form).remove();
 
@@ -148,7 +149,13 @@ $(function() {
 			ingredients.push(ingredient);
 		}
 
-		addField().focus();
+		field = addField();
+
+		// automatically focus the empty field only on webkit browsers. Other
+		// browsers hide the placeholder as soon as the field is focused and
+		// might confuse users, as they wouldn't know what to enter.
+		if ($.browser.webkit)
+			field.focus();
 
 		updateTitle();
 		loadInitial();
