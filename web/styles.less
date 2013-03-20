@@ -1,0 +1,189 @@
+@foreground-color: #333;
+@source-link-horizontal-padding: 5px;
+@search-form-width: 260px;
+
+.display-box(@width: 100%) {
+	display: -webkit-box;
+	display: -moz-box;
+	display: box;
+
+	// it's important to explicitly set a width (other than auto),
+	// because of if no width is specified (or when it is set to auto),
+	// webkit uses the full available width, while firefox uses as
+	// less width as possible like for block elements.
+	width: @width;
+}
+
+.box-flex(@flex) {
+	-webkit-box-flex: @flex;
+	-moz-box-flex: @flex;
+	box-flex: @flex;
+}
+
+.box-orient(@orient) {
+	-webkit-box-orient: @orient;
+	-moz-box-orient: @orient;
+	box-orient: @orient;
+}
+
+* {
+	font-family: 'Donegal One', serif !important;
+
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+
+	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+h2 {
+	font-size: 1.4em;
+	line-height: 1.3em;
+	margin-top: 0;
+}
+
+h3 {
+	font-size: 1.2em;
+	line-height: 1.4em;
+	margin-top: 0;
+	margin-bottom: 5px;
+}
+
+a, a:hover, a:active {
+	color: @foreground-color;
+}
+
+body {
+	overflow-y: scroll;
+}
+
+form {
+	margin: 0;
+}
+
+li {
+	list-style-type: none;
+	text-indent: -24px;
+}
+
+#search-form {
+	position: fixed;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	width: @search-form-width;
+	padding: 1em;
+	overflow: auto;
+
+	input {
+		width: 100%;
+		height: auto;
+	}
+}
+
+#search-results {
+	margin-left: @search-form-width;
+	padding: 1em;
+}
+
+.cocktail {
+	overflow: auto;
+	padding-bottom: 2em;
+	position: relative;
+
+	&:last-child {
+		padding-bottom: 0;
+	}
+}
+
+.recipe {
+	.display-box(700px);
+
+	&:not(.active) {
+		display: none;
+	}
+}
+
+.picture {
+	padding-right: 1em;
+
+	* {
+		width: 140px;
+		display: inline-block;
+	}
+}
+
+.details {
+	.box-flex(1);
+}
+
+.ingredients-and-sources {
+	.display-box;
+}
+
+.ingredients {
+	.box-flex(1);
+	margin-right: 1em;
+
+	li {
+		font-size: 1.1em;
+		line-height: 1.5em;
+	}
+}
+
+.sources {
+	width: 130px;
+
+	li {
+		font-size: 0.9em;
+		line-height: 1.8em;
+	}
+
+	a {
+		margin-left: -@source-link-horizontal-padding;
+		padding: 2px @source-link-horizontal-padding;
+		border-radius: 7px;
+
+		&.active,
+		&.active:hover {
+			background-color: @foreground-color;
+			color: #fff;
+			text-decoration: none;
+		}
+	}
+}
+
+#github-ribbon {
+	position: fixed;
+	top: 0;
+	right: 0;
+}
+
+@media (max-width: 1000px) {
+	#search-form {
+		position: static;
+		width: auto;
+	}
+
+	#search-results {
+		margin-left: -@source-link-horizontal-padding;
+	}
+
+	.recipe {
+		padding-left: @source-link-horizontal-padding;
+		width: 100%;
+	}
+
+	#github-ribbon {
+		display: none;
+	}
+}
+
+@media (max-width: 580px) {
+	.picture {
+		display: none;
+	}
+
+	.ingredients-and-sources {
+		.box-orient(vertical);
+	}
+}

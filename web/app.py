@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
+import os
 import re
+import subprocess
 from collections import OrderedDict
 import sphinxapi
 
@@ -19,6 +21,7 @@ MAX_RECIPES_PER_COCKTAIL = 10
 
 SPHINX_HOST = getattr(settings, 'SPHINX_HOST', 'localhost')
 SPHINX_PORT = getattr(settings, 'SPHINX_PORT', 9312)
+LESSC_OPTIONS = getattr(settings, 'LESSC_OPTIONS', [])
 
 RECIPE_TEMPLATE = '''\
 <div class="recipe%(extra_css)s">
@@ -41,6 +44,7 @@ RECIPE_TEMPLATE = '''\
 class CocktailsApp(object):
 	urls = Map([
 		Rule('/recipes', endpoint='recipes'),
+		Rule('/static/css/styles.css', endpoint='css'),
 	])
 
 	def make_query(self, sphinx, ingredients):
@@ -181,6 +185,21 @@ class CocktailsApp(object):
 
 		return Response(''.join(output), mimetype='text/html')
 
+	def on_css(self, request):
+		lessc = subprocess.Popen([
+			'lessc',
+		] + LESSC_OPTIONS + [
+			os.path.join(
+				os.path.dirname(__file__),
+				'styles.less'
+			)
+		], stdout=subprocess.PIPE)
+
+		response = Response(lessc.stdout, mimetype='text/css')
+		response.call_on_close(lessc.wait)
+
+		return response
+
 	def dispatch_request(self, request):
 		adapter = self.urls.bind_to_environ(request.environ)
 		try:
@@ -195,8 +214,6 @@ class CocktailsApp(object):
 		return self.dispatch_request(Request(environ))(environ, start_response)
 
 if __name__ == '__main__':
-	import os
-
 	from werkzeug.wsgi import SharedDataMiddleware
 	from werkzeug.serving import run_simple
 
