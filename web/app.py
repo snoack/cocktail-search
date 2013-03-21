@@ -247,7 +247,7 @@ class CocktailsApp(object):
 		else:
 			(address, port) = ('localhost', listen)
 
-		run_simple(address, int(port), app, static_files={
+		run_simple(address, int(port), app, use_reloader=True, static_files={
 			'/static/': STATIC_FILES_DIR,
 		})
 
