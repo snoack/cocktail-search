@@ -21,6 +21,7 @@ except ImportError:
 MAX_COCKTAILS_PER_PAGE = 20
 MAX_RECIPES_PER_COCKTAIL = 10
 
+SITE_URL = getattr(settings, 'SITE_URL', 'http://localhost:8000/')
 SPHINX_HOST = getattr(settings, 'SPHINX_HOST', 'localhost')
 SPHINX_PORT = getattr(settings, 'SPHINX_PORT', 9312)
 LESSC_OPTIONS = getattr(settings, 'LESSC_OPTIONS', [])
@@ -45,6 +46,14 @@ RECIPE_TEMPLATE = '''\
 	</div>
 </div>'''
 
+OPENSEARCH_TEMPLATE = '''\
+<?xml version="1.0"?>
+<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
+    <ShortName>Cocktail Search</ShortName>
+    <Url type="text/html" template="%(site_url)s#{searchTerms}"/>
+</OpenSearchDescription>
+'''
+
 class CocktailsApp(object):
 	urls = Map([
 		Rule('/recipes', endpoint='recipes'),
@@ -52,6 +61,7 @@ class CocktailsApp(object):
 
 	generated_files = {
 		'css/styles.css': 'css',
+		'opensearch.xml': 'open_search_description',
 	}
 
 	def make_query(self, sphinx, ingredients):
@@ -207,6 +217,9 @@ class CocktailsApp(object):
 
 		lessc.stdout.close()
 		lessc.wait()
+
+	def generate_open_search_description(self):
+		return [OPENSEARCH_TEMPLATE % {'site_url': SITE_URL}]
 
 	def cmd_runserver(self, listen='8000'):
 		from werkzeug.serving import run_simple
