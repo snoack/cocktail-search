@@ -2,6 +2,8 @@
 
 import os
 import re
+import posixpath
+import mimetypes
 import subprocess
 from collections import OrderedDict
 import sphinxapi
@@ -22,6 +24,8 @@ MAX_RECIPES_PER_COCKTAIL = 10
 SPHINX_HOST = getattr(settings, 'SPHINX_HOST', 'localhost')
 SPHINX_PORT = getattr(settings, 'SPHINX_PORT', 9312)
 LESSC_OPTIONS = getattr(settings, 'LESSC_OPTIONS', [])
+
+STATIC_FILES_DIR = os.path.join(os.path.dirname(__file__), 'static')
 
 RECIPE_TEMPLATE = '''\
 <div class="recipe%(extra_css)s">
@@ -44,8 +48,11 @@ RECIPE_TEMPLATE = '''\
 class CocktailsApp(object):
 	urls = Map([
 		Rule('/recipes', endpoint='recipes'),
-		Rule('/static/css/styles.css', endpoint='css'),
 	])
+
+	generated_files = {
+		'css/styles.css': 'css',
+	}
 
 	def make_query(self, sphinx, ingredients):
 		queries = []
@@ -115,7 +122,7 @@ class CocktailsApp(object):
 
 		return cocktails
 
-	def on_recipes(self, request):
+	def view_recipes(self, request):
 		ingredients = [s for s in request.args.getlist('ingredient') if s.strip()]
 
 		if not ingredients:
@@ -185,7 +192,7 @@ class CocktailsApp(object):
 
 		return Response(''.join(output), mimetype='text/html')
 
-	def on_css(self, request):
+	def generate_css(self):
 		lessc = subprocess.Popen([
 			'lessc',
 		] + LESSC_OPTIONS + [
@@ -195,39 +202,80 @@ class CocktailsApp(object):
 			)
 		], stdout=subprocess.PIPE)
 
-		response = Response(lessc.stdout, mimetype='text/css')
-		response.call_on_close(lessc.wait)
+		for line in lessc.stdout:
+			yield line
 
-		return response
+		lessc.stdout.close()
+		lessc.wait()
+
+	def cmd_runserver(self, listen='8000'):
+		from werkzeug.serving import run_simple
+
+		def view_index(request):
+			path = os.path.join(STATIC_FILES_DIR, 'index.html')
+			return Response(open(path, 'rb'), mimetype='text/html')
+
+		self.view_index = view_index
+		self.urls.add(Rule('/', endpoint='index'))
+
+		def view_generated(request, path):
+			endpoint = self.generated_files.get(path)
+			if endpoint is None:
+				raise NotFound
+			iterable = getattr(self, 'generate_' + endpoint)()
+			mimetype = mimetypes.guess_type(path)[0]
+			return Response(iterable, mimetype=mimetype)
+
+		self.view_generated = view_generated
+		self.urls.add(Rule('/static/<path:path>', endpoint='generated'))
+
+		if ':' in listen:
+			(address, port) = listen.rsplit(':', 1)
+		else:
+			(address, port) = ('localhost', listen)
+
+		run_simple(address, int(port), app, static_files={
+			'/static/': STATIC_FILES_DIR,
+		})
+
+	def cmd_deploy(self):
+		for path, endpoint in self.generated_files.iteritems():
+			print 'Generating ' + path
+
+			iterable = getattr(self, 'generate_' + endpoint)()
+			path = os.path.join(STATIC_FILES_DIR, *posixpath.split(path))
+
+			with open(path, 'wb') as outfile:
+				for data in iterable:
+					outfile.write(data)
 
 	def dispatch_request(self, request):
 		adapter = self.urls.bind_to_environ(request.environ)
 		try:
 			endpoint, values = adapter.match()
-			return getattr(self, 'on_' + endpoint)(request, **values)
+			return getattr(self, 'view_' + endpoint)(request, **values)
 		except NotFound, e:
 			return Response(status=404)
 		except HTTPException, e:
 			return e
 
+	def call_command(self, command, args):
+		getattr(self, 'cmd_' + command)(*args)
+
+	def list_commands(self):
+		return [x[4:] for x in dir(self) if x.startswith('cmd_')]
+
 	def __call__(self, environ, start_response):
 		return self.dispatch_request(Request(environ))(environ, start_response)
 
 if __name__ == '__main__':
-	from werkzeug.wsgi import SharedDataMiddleware
-	from werkzeug.serving import run_simple
-
-	STATIC_FILES_DIR = os.path.join(os.path.dirname(__file__), 'static')
-
-	def on_index(request):
-		with open(os.path.join(STATIC_FILES_DIR, 'index.html')) as f:
-			data = f.read()
-
-		return Response(data, mimetype='text/html')
+	import argparse
 
 	app = CocktailsApp()
-	app.on_index = on_index
-	app.urls.add(Rule('/', endpoint='index'))
-	app = SharedDataMiddleware(app, {'/static/': STATIC_FILES_DIR})
 
-	run_simple('127.0.0.1', 5000, app)
+	parser = argparse.ArgumentParser()
+	parser.add_argument('command', choices=app.list_commands())
+	parser.add_argument('arg', nargs='*')
+	args = parser.parse_args()
+
+	app.call_command(args.command, args.arg)
