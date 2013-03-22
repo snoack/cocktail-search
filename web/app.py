@@ -60,7 +60,7 @@ class CocktailsApp(object):
 	])
 
 	generated_files = {
-		'css/styles.css': 'css',
+		'all.css': 'css',
 		'opensearch.xml': 'open_search_description',
 	}
 
@@ -208,7 +208,8 @@ class CocktailsApp(object):
 		] + LESSC_OPTIONS + [
 			os.path.join(
 				os.path.dirname(__file__),
-				'styles.less'
+				'less',
+				'all.less'
 			)
 		], stdout=subprocess.PIPE)
 

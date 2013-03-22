@@ -1,7 +1,3 @@
-@foreground-color: #333;
-@source-link-horizontal-padding: 5px;
-@search-form-width: 260px;
-
 .display-box(@width: 100%) {
 	display: -webkit-box;
 	display: -moz-box;
@@ -27,11 +23,8 @@
 }
 
 * {
-	font-family: 'Donegal One', serif !important;
-
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
-
 	-webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 }
 
@@ -46,10 +39,6 @@ h3 {
 	line-height: 1.4em;
 	margin-top: 0;
 	margin-bottom: 5px;
-}
-
-a, a:hover, a:active {
-	color: @foreground-color;
 }
 
 body {
@@ -70,7 +59,7 @@ li {
 	top: 0;
 	bottom: 0;
 	left: 0;
-	width: @search-form-width;
+	width: @searchFormWidth;
 	padding: 1em;
 	overflow: auto;
 
@@ -81,7 +70,7 @@ li {
 }
 
 #search-results {
-	margin-left: @search-form-width;
+	margin-left: @searchFormWidth;
 	padding: 1em;
 }
 
@@ -139,14 +128,13 @@ li {
 	}
 
 	a {
-		margin-left: -@source-link-horizontal-padding;
-		padding: 2px @source-link-horizontal-padding;
+		margin-left: -@sourcePaddingHorizontal;
+		padding: 2px @sourcePaddingHorizontal;
 		border-radius: 7px;
 
-		&.active,
-		&.active:hover {
-			background-color: @foreground-color;
-			color: #fff;
+		&.active {
+			background-color: @sourceSelectedBackground;
+			color: @sourceSelectedColor;
 			text-decoration: none;
 		}
 	}
@@ -165,11 +153,11 @@ li {
 	}
 
 	#search-results {
-		margin-left: -@source-link-horizontal-padding;
+		margin-left: -@sourcePaddingHorizontal;
 	}
 
 	.recipe {
-		padding-left: @source-link-horizontal-padding;
+		padding-left: @sourcePaddingHorizontal;
 		width: 100%;
 	}
 
