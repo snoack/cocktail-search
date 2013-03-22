@@ -120,7 +120,9 @@ $(function() {
 		});
 
 		field.blur(function() {
-			$('input[value=]', form).slice(0, -1).remove();
+			$('input', form).filter(function() {
+				return this.value == '';
+			}).slice(0, -1).remove();
 		});
 	};
 
@@ -160,7 +162,7 @@ $(function() {
 		// automatically focus the empty field only on webkit browsers. Other
 		// browsers hide the placeholder as soon as the field is focused and
 		// might confuse users, as they wouldn't know what to enter.
-		if ($.browser.webkit)
+		if (/ AppleWebKit\//.test(navigator.userAgent))
 			field.focus();
 
 		updateTitle();
