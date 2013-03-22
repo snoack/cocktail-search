@@ -4,3 +4,4 @@ rhum > rum
 akvavit > aquavit
 ginger beer > gingerbeer
 pimento > allspice
+xocolatl > chocolate
