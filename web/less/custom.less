@@ -75,20 +75,13 @@ li {
 }
 
 .cocktail {
-	overflow: auto;
+	.display-box(700px);
+
 	padding-bottom: 2em;
 	position: relative;
 
 	&:last-child {
 		padding-bottom: 0;
-	}
-}
-
-.recipe {
-	.display-box(700px);
-
-	&:not(.active) {
-		display: none;
 	}
 }
 
@@ -156,7 +149,7 @@ li {
 		margin-left: -@sourcePaddingHorizontal;
 	}
 
-	.recipe {
+	.cocktail {
 		padding-left: @sourcePaddingHorizontal;
 		width: 100%;
 	}

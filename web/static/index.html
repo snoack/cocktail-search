@@ -7,7 +7,42 @@
 <link href="http://fonts.googleapis.com/css?family=Donegal+One" rel="stylesheet">
 <link href="/static/opensearch.xml" rel="search" type="application/opensearchdescription+xml" title="Cocktail Search">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js"></script>
+<script src="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js"></script>
 <script src="/static/script.js"></script>
+<script type="text/template" id="cocktail-template">
+<div class="picture">
+	<% if (recipe.picture_url) { %>
+		<a href="<%- recipe.url %>">
+			<img src="<%- recipe.picture_url %>" alt="<%- recipe.title %>">
+		</a>
+	<% } else { %>
+		<span></span>
+	<% } %>
+</div>
+<div class="details">
+	<h2><a href="<%- recipe.url %>"><%- recipe.title %></a></h2>
+	<div class="ingredients-and-sources">
+		<ul class="ingredients">
+			<% _.each(recipe.ingredients, function(ingredient) { %>
+				<li><%- ingredient %></li>
+			<% }); %>
+		</ul>
+		<div class="sources">
+			<h3>Source</h3>
+			<ul>
+				<% _.each(sources, function(recipes, source) { %>
+					<li>
+						<% _.each(recipes, function(otherRecipe, idx) { %>
+							<% if (recipe == otherRecipe) { %><a class="active"><% } else { %><a href="javascript:void(0)" data-source="<%- source %>" data-recipe="<%= idx %>"><% } %><% if (idx == 0) { %><%- source %><% } else { %>(<%= idx + 1 %>)<% } %></a>
+						<% }); %>
+					</li>
+				<% }); %>
+			</ul>
+		</div>
+	</div>
+</div>
+</script>
 </head>
 <body>
 <div id="search-form">

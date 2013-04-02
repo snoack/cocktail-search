@@ -2,6 +2,7 @@
 
 import os
 import re
+import json
 import posixpath
 import mimetypes
 import subprocess
@@ -9,7 +10,7 @@ from collections import OrderedDict
 import sphinxapi
 
 from werkzeug.wrappers import Request, Response
-from werkzeug.exceptions import HTTPException, NotFound
+from werkzeug.exceptions import HTTPException, NotFound, InternalServerError
 from werkzeug.routing import Map, Rule
 from werkzeug.utils import escape
 
@@ -27,24 +28,6 @@ SPHINX_PORT = getattr(settings, 'SPHINX_PORT', 9312)
 LESSC_OPTIONS = getattr(settings, 'LESSC_OPTIONS', [])
 
 STATIC_FILES_DIR = os.path.join(os.path.dirname(__file__), 'static')
-
-RECIPE_TEMPLATE = '''\
-<div class="recipe%(extra_css)s">
-	<div class="picture">
-		%(picture)s
-	</div>
-	<div class="details">
-		<h2><a href="%(url)s">%(title)s</a></h2>
-		<div class="ingredients-and-sources">
-			<ul class="ingredients">
-				%(ingredients)s
-			</ul>
-			<div class="sources">
-				%(sources)s
-			</div>
-		</div>
-	</div>
-</div>'''
 
 OPENSEARCH_TEMPLATE = '''\
 <?xml version="1.0"?>
@@ -134,9 +117,10 @@ class CocktailsApp(object):
 
 	def view_recipes(self, request):
 		ingredients = [s for s in request.args.getlist('ingredient') if s.strip()]
+		cocktails = []
 
 		if not ingredients:
-			return Response('', mimetype='text/html')
+			return Response(json.dumps(cocktails), mimetype='application/json')
 
 		try:
 			offset = int(request.args['offset'])
@@ -147,60 +131,26 @@ class CocktailsApp(object):
 		sphinx.SetServer(SPHINX_HOST, SPHINX_PORT)
 		sphinx.Open()
 		try:
-			cocktails = self.query(sphinx, ingredients, offset)
+			result = self.query(sphinx, ingredients, offset)
 		finally:
 			sphinx.Close()
 
-		output = []
+		if result is None:
+			raise InternalServerError(sphinx.GetLastError())
 
-		if cocktails is None:
-			output.append('<div class="alert">')
-			output.append(escape(sphinx.GetLastError()))
-			output.append('</div>')
-		else:
-			for recipes in cocktails:
-				output.append('<div class="cocktail">')
+		for group in result:
+			recipes = []
+			for match in group:
+				recipes.append({
+					'title':       match['attrs']['title'],
+					'ingredients': match['attrs']['ingredients_text'].splitlines(),
+					'url':         match['attrs']['url'],
+					'picture_url': match['attrs']['picture'],
+					'source':      match['attrs']['source'],
+				})
+			cocktails.append({'recipes': recipes})
 
-				sources = OrderedDict()
-				for recipe in recipes:
-					sources.setdefault(recipe['attrs']['source'], []).append(recipe)
-
-				is_first = True
-				for source, recipes in sources.iteritems():
-					for recipe in recipes:
-						attrs = recipe['attrs']
-
-						output.append(RECIPE_TEMPLATE % {
-							'title': escape(attrs['title']),
-							'url': escape(attrs['url']),
-							'picture': '<a href="%s"><img src="%s" alt="%s"/></a>' % (
-								escape(attrs['url']),
-								escape(attrs['picture']),
-								escape(attrs['title']),
-							) if attrs['picture'] else '<span></span>',
-							'ingredients': ''.join(
-								'<li>%s</li>' % escape(s) for s in attrs['ingredients_text'].splitlines()
-							),
-							'sources': '<h3>Source</h3><ul>%s</ul>' % ''.join(
-								'<li>%s</li>' % ' '.join(
-									'<a %s>%s</a>' % (
-										'class="active"' if recipe is other_recipe else 'href="javascript:void(0)"',
-										label
-									) for other_recipe, label in zip(other_recipes, [
-										other_source
-									] + [
-										'(%d)' % (i + 1) for i in xrange(1, len(other_recipes))
-									])
-								) for other_source, other_recipes in sources.iteritems()
-							),
-							'extra_css': ' active' if is_first else '',
-						})
-
-						is_first = False
-
-				output.append('</div>')
-
-		return Response(''.join(output), mimetype='text/html')
+		return Response(json.dumps(cocktails), mimetype='application/json')
 
 	def generate_css(self):
 		lessc = subprocess.Popen([

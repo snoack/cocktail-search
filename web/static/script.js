@@ -1,4 +1,94 @@
 $(function() {
+	var Cocktail = Backbone.Model.extend();
+
+	var SearchResults = Backbone.Collection.extend({
+		model: Cocktail,
+
+/*
+		initialize : function(models, options) {
+			this.ingredients = options.ingredients;
+		},
+*/
+		url: function() {
+			return '/recipes?' + $.param($.map(this.ingredients, function(x) {
+				return {name: 'ingredient', value: x};
+			}));
+		},
+		parse: function(resp, options) {
+			this.canLoadMore = resp.length > 0;
+			return resp;
+		}
+	});
+
+	var CocktailView = Backbone.View.extend({
+		className: 'cocktail',
+
+		events: {
+			'click .sources a[href]': 'onSwitchRecipe'
+		},
+
+		template: _.template($('#cocktail-template').html()),
+
+		render: function() {
+			var sources = _.groupBy(
+				this.model.get('recipes'),
+				function(recipe) { return recipe.source; }
+			);
+
+			var recipe = sources[
+				this.currentSource || _.keys(sources)[0]
+			][
+				this.currentRecipe || 0
+			];
+
+			this.$el.html(this.template({recipe: recipe, sources: sources}));
+			return this;
+		},
+
+		onSwitchRecipe: function(event) {
+			var link = $(event.currentTarget);
+
+			this.currentSource = link.attr('data-source');
+			this.currentRecipe = link.attr('data-recipe');
+
+			this.setElement(this.render().$el);
+		}
+	});
+
+	var SearchResultsView = Backbone.View.extend({
+		el: $('#search-results'),
+
+		initialize : function(options) {
+			_.bindAll(this, 'add', 'remove');
+
+			this.cocktailViews = [];
+
+			this.collection.each(this.add);
+
+			this.collection.bind('add', this.add);
+			this.collection.bind('remove', this.remove);
+		},
+
+		add: function(cocktail) {
+			var view = new CocktailView({model: cocktail});
+			view.setElement(view.render().$el.appendTo(this.$el));
+			this.cocktailViews.push(view);
+		},
+
+		remove: function(cocktail) {
+			_.each(this.cocktailViews, function(view) {
+				if (view.model == cocktail) {
+					view.$el.remove();
+					this.cocktailViews = _.without(this.cocktailViews, view);
+				}
+			});
+		}
+	});
+
+	var collection = new SearchResults();
+	var view = new SearchResultsView({collection: collection});
+
+
 	var results = $('#search-results');
 	var form = $('form');
 	var viewport = $(window);
@@ -13,66 +103,6 @@ $(function() {
 
 	var state;
 	var state_is_volatile;
-
-	var load = function(callback) {
-		can_load_more = false;
-
-		jQuery.ajax('/recipes', {
-			data: form.serializeArray().concat([{name: 'offset', value: offset}]),
-			success: function(data) {
-				var elements = $(data);
-				var n = elements.filter('.cocktail').length;
-
-				callback(elements, n);
-				can_load_more = n > 1;
-
-				$($('.cocktail').slice(-n)).each(function(_, cocktail) {
-					var recipes = $('.recipe', cocktail);
-
-					recipes.each(function(_, recipe) {
-						$('.sources a', recipe).each(function(idx, source) {
-							$(source).click(function(event) {
-								var scrollOffset = $('body').scrollTop();
-								var recipe = $(recipes[idx]);
-
-								recipes.each(function(_, recipe) {
-									recipe = $(recipe);
-
-									if (recipe.hasClass('active')) {
-										scrollOffset -= $('.sources', recipe)[0].offsetTop;
-										recipe.removeClass('active');
-									}
-								});
-
-								recipe.addClass('active');
-								scrollOffset += $('.sources', recipe)[0].offsetTop;
-								viewport.scrollTop(scrollOffset);
-							});
-						});
-					});
-				});
-			}
-		});
-	};
-
-	var loadInitial = function() {
-		offset = 0;
-
-		load(function(elements, n) {
-			results.html(elements);
-			offset = n;
-
-			window.scrollTo(0, 0);
-			setTimeout(function() { state_is_volatile = true; }, 0);
-		});
-	};
-
-	var loadMore = function() {
-		load(function(elements, n) {
-			results.append(elements);
-			offset += n;
-		});
-	};
 
 	var updateTitle = function() {
 		var title = original_title;
@@ -116,7 +146,9 @@ $(function() {
 			state_is_volatile = true;
 
 			updateTitle();
-			loadInitial();
+
+			collection.ingredients = ingredients;
+			collection.fetch();
 		});
 
 		field.blur(function() {
@@ -166,7 +198,9 @@ $(function() {
 			field.focus();
 
 		updateTitle();
-		loadInitial();
+
+		collection.ingredients = ingredients;
+		collection.fetch();
 	};
 
 	results.mousedown(function() {
@@ -176,12 +210,13 @@ $(function() {
 	viewport.scroll(function() {
 		state_is_volatile = false;
 
-		if (!can_load_more)
+		if (!collection.canLoadMore)
 			return;
 		if (viewport.scrollTop() + viewport.height() < $('.cocktail').slice(-5)[0].offsetTop)
 			return;
 
-		loadMore();
+		collection.canLoadMore = false;
+		collection.fetch({remove:false, data:{offset:collection.length}});
 	});
 
 	viewport.on('popstate', populateForm);
