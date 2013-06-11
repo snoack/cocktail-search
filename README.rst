@@ -12,7 +12,14 @@ Getting started
 Cloning the repository
 ~~~~~~~~~~~~~~~~~~~~~~
 
-::
+If you are going to create the virtual environment (see next section), then
+create a directory which becomes the parent directory of the repository and
+will be otherwise empty::
+
+    mkdir cocktail-search
+    cd cocktail-search
+
+Clone the repository and its submodules::
 
     git clone https://github.com/wallunit/cocktail-search
     cd cocktail-search
@@ -20,27 +27,29 @@ Cloning the repository
     git submodule update
 
 
-Dependencies
-~~~~~~~~~~~~
+Installing dependencies
+~~~~~~~~~~~~~~~~~~~~~~~
 
- * Python 2.7
+There is a script that creates a `virtual environment`_ and installs all
+dependencies into the environment. Assuming you have virtualenv and pip already
+installed and that you have created the directory, that became the parent
+directory of the repository, as described in the previous section, run following
+command::
 
-   * `werkzeug`_
-   * `scrapy`_
-   * Stemmer
-   * lxml
+    ./bootstrap-virtualenv.sh ..
 
- * `Sphinx`_
- * `less`_
+If it still fails, it is most likely because of you are missing a development
+package required to build one of the dependencies. In that case install the
+missing package and start over.
 
-If you are on Debian Wheezy you can install everything except less with
-apt-get::
+Make sure that the virtual environment is active before you run scrapy, searchd,
+indexer or app.py. You can activate the virtual environment like that::
 
-    apt-get install python-werkzeug python-scrapy python-stemmer python-lxml sphinxsearch
+    source ../bin/activate
 
-In order to install less, `install node.js`_ and run::
-
-    npm install -g less
+Alternatively you can install the dependencies system-wide. For the Python
+packages have a look at *requirements.txt* or just run ``pip install -r requirements.txt``.
+For the other dependencies have a look at the contents of *bootstrap-virtualenv.sh*.
 
 
 Crawling
@@ -52,9 +61,9 @@ don't run the crawler unless absolutely necessary, for example when you have to
 test a spider, that you have just added or modified. For any other case, I made
 the files with the cocktail recipes I have already crawled available for you::
 
-    wget -r -A .json http://cocktails.p24dev.de/data/
-    mv cocktails.p24dev.de/data/* crawler/
-    rm -r cocktails.p24dev.de
+    wget -r -A .json http://cocktails.djacap.net/dumps/
+    mv cocktails.djacap.net/dumps/* crawler/
+    rm -r cocktails.djacap.net
 
 However following command will run the crawler for a given spider::
 
@@ -85,13 +94,13 @@ In order to serve the website from your local machine and start hacking, there
 is no need to setup an advanced web server like Apache. Just run the development
 server and go to http://localhost:8000/ with your web browser::
 
-    ./web/app runserver
+    ./web/app.py runserver
 
 By default the development server only listens on localhost. However if you want
 to access the website from an other device you can make it also listen on all
 interfaces::
 
-    ./web/app runserver 0.0.0.0:8000
+    ./web/app.py runserver 0.0.0.0:8000
 
 
 Deploying the production environment
@@ -100,9 +109,9 @@ Deploying the production environment
 Configuring the web app
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-Create the file `web/settings.py` and set follwing options::
+Create the file *web/settings.py* and set follwing options::
 
-    SITE_URL = 'http://cocktails.p24dev.de/'
+    SITE_URL = 'http://cocktails.djacap.net/'
     LESSC_OPTIONS = ['--compress']
 
 
@@ -112,16 +121,23 @@ Configuring Apache
 ::
 
         <VirtualHost *:80>
-                ServerName cocktails.p24dev.de
-                Alias /static /var/www/cocktails/web/static
+                ServerName cocktails.djacap.net
 
-                WSGIDaemonProcess cocktails processes=4 maximum-requests=500 threads=1
+                WSGIDaemonProcess cocktails [processes=<num>] [python-path=<path to environment>/lib/python2.7/site-packages]
                 WSGIProcessGroup  cocktails
-                WSGIScriptAlias   / /var/www/cocktails/web/app.wsgi
+                WSGIScriptAlias   / <path to repository>/web/app.wsgi
+
+                Alias /static <path to repository>/web/static
 
                 RewriteEngine On
                 RewriteRule ^/$ /static/index.html [P]
         </VirtualHost>
+
+The ``processes`` option is required to utilize multiple CPU units or cores, in order
+to handle concurrent requests faster.
+
+The ``python-path`` option is required when you have used virtualenv to install the
+dependencies.
 
 
 Generating static files
@@ -131,7 +147,7 @@ Some static files (like the CSS which is compiled from less) are generated on
 the fly in the development environment, but must be compiled when deploying the
 production environment, in order to serve them faster::
 
-    ./web/app deploy
+    ./web/app.py deploy
 
 Remember to call that command every time you deploy a new version.
 
@@ -145,7 +161,7 @@ Build the index and start the search daemon::
     indexer --all
     searchd
 
-Note that we omitted the `--console` option, in order to make searchd run in the
+Note that we omitted the ``--console`` option, in order to make searchd run in the
 background. However instead of just calling searchd on the command line, it
 would be even better to set up an init script to start and stop Sphinx.
 
@@ -177,7 +193,8 @@ You have found a bug and don't want to fix it yourself. Or you have an awesome
 idea to improve the cocktail search? That's great. Please send me an email or
 even better `use the issue tracker`_.
 
-.. _demo: http://cocktails.p24dev.de/
+.. _demo: http://cocktails.djacap.net/
+.. _virtual environment: http://www.virtualenv.org/
 .. _werkzeug: http://www.pocoo.org/projects/werkzeug/
 .. _scrapy: http://scrapy.org/
 .. _Sphinx: http://sphinxsearch.com/

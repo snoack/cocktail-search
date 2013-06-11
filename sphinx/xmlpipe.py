@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 import sys
 import os
@@ -9,14 +9,20 @@ from itertools import imap, groupby
 from difflib import SequenceMatcher
 
 from werkzeug.utils import escape
-from Stemmer import Stemmer
+
+try:
+	# https://pypi.python.org/pypi/snowballstemmer
+	from snowballstemmer import stemmer
+except ImportError:
+	# http://snowball.tartarus.org/wrappers/guide.html
+	from Stemmer import Stemmer as stemmer
 
 ee = lambda s: escape(s).encode('utf-8')
-stemmer = Stemmer('english')
+stemmer_en = stemmer('english')
 
 def normalize_title(s):
 	s = re.sub(r'[^\w\s]', '', normalize('NFKD', s)).lower()
-	s = ' '.join(stemmer.stemWords(s.split()))
+	s = ' '.join(stemmer_en.stemWords(s.split()))
 	s = re.match('(?:the )?(?:dri )?(?:rye (?=sazerac))?(.*?)(?: cocktail)?(?: for a crowd)?(?: dri)?(?: the)?$', s).group(1)
 	s = s.replace(' ', '')
 
