@@ -15,22 +15,22 @@ def html_to_text(s):
 	s = re.sub(r'\s+', ' ', s)
 	return s
 
-def split_at_br(hxs):
-	nodes = hxs.select('descendant-or-self::br|descendant-or-self::text()')
+def split_at_br(hxs, include_blank=False, newline_elements=['br']):
+	nodes = hxs.select('|'.join('descendant-or-self::' + el for el in newline_elements + ['text()']))
 	snippets = []
 	rv = []
 
 	while True:
 		node = nodes.pop(0) if nodes else None
 
-		if node and node.xmlNode.name != 'br':
+		if node and node.xmlNode.name not in newline_elements:
 			snippets.append(node.extract())
 			continue
 
 		s = ''.join(snippets).strip()
 		snippets = []
 
-		if s:
+		if s or include_blank:
 			rv.append(s)
 
 		if not node:
