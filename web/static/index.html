@@ -34,7 +34,7 @@
 				<% _.each(sources, function(recipes, source) { %>
 					<li>
 						<% _.each(recipes, function(otherRecipe, idx) { %>
-							<% if (recipe == otherRecipe) { %><a class="active"><% } else { %><a href="javascript:void(0)" data-source="<%- source %>" data-recipe="<%= idx %>"><% } %><% if (idx == 0) { %><%- source %><% } else { %>(<%= idx + 1 %>)<% } %></a>
+							<a <% if (recipe == otherRecipe) { %>class="active"<% } else { %>href="javascript:void(0)"<% } %> data-source="<%- source %>" data-recipe="<%= idx %>"><% if (idx == 0) { %><%- source %><% } else { %>(<%= idx + 1 %>)<% } %></a>
 						<% }); %>
 					</li>
 				<% }); %>

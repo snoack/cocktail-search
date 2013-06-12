@@ -29,6 +29,20 @@ $(function() {
 
 		template: _.template($('#cocktail-template').html()),
 
+		adjustSourcesWidth: function() {
+			$('.sources li', this.$el).each(function(idx, source) {
+				var label = $(':first-child', source);
+				var text = label.attr('data-source');
+
+				label.text(text.substr(0, 1) + '...');
+				var maxWidth = source.scrollWidth;
+
+				label.text(text);
+				while (source.scrollWidth > maxWidth)
+					label.text((text = text.slice(0, -1)) + '...');
+			});
+		},
+
 		render: function() {
 			var sources = _.groupBy(
 				this.model.get('recipes'),
@@ -52,6 +66,7 @@ $(function() {
 			this.currentRecipe = link.attr('data-recipe');
 
 			this.setElement(this.render().$el);
+			this.adjustSourcesWidth();
 		}
 	});
 
@@ -59,7 +74,7 @@ $(function() {
 		el: $('#search-results'),
 
 		initialize : function(options) {
-			_.bindAll(this, 'add', 'remove');
+			_.bindAll(this, 'add', 'remove', 'adjustSourcesWidth');
 
 			this.cocktailViews = [];
 
@@ -72,6 +87,7 @@ $(function() {
 		add: function(cocktail) {
 			var view = new CocktailView({model: cocktail});
 			view.setElement(view.render().$el.appendTo(this.$el));
+			view.adjustSourcesWidth();
 			this.cocktailViews.push(view);
 		},
 
@@ -82,6 +98,10 @@ $(function() {
 					this.cocktailViews = _.without(this.cocktailViews, view);
 				}
 			});
+		},
+
+		adjustSourcesWidth: function() {
+			_.invoke(this.cocktailViews, 'adjustSourcesWidth');
 		}
 	});
 
@@ -109,7 +129,6 @@ $(function() {
 
 		if (ingredients.length > 0)
 			title += ': ' + ingredients.join(', ');
-
 		document.title = title;
 	};
 
@@ -203,6 +222,25 @@ $(function() {
 		collection.fetch();
 	};
 
+	var adjustSourcesWidthOnResize = function() {
+		var width = document.width || window.innerWidth;
+
+		if (width > 580)
+			// the width of the sources stays constant at
+			// a document width of above 580px
+			var mediaQueryList = matchMedia('(min-width: 581px)');
+		else
+			var mediaQueryList = matchMedia('(width: ' + width + 'px)');
+
+		var listener = function() {
+			mediaQueryList.removeListener(listener);
+			adjustSourcesWidthOnResize();
+			view.adjustSourcesWidth();
+		};
+
+		mediaQueryList.addListener(listener);
+	};
+
 	results.mousedown(function() {
 		state_is_volatile = false;
 	});
@@ -223,4 +261,5 @@ $(function() {
 
 	prepareField(initial_field);
 	populateForm();
+	adjustSourcesWidthOnResize();
 });
