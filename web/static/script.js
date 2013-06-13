@@ -43,6 +43,14 @@ $(function() {
 			});
 		},
 
+		backupScrollPosition: function() {
+			return viewport.scrollTop() - $('.sources', this.$el)[0].offsetTop;
+		},
+
+		restoreScrollPosition: function(pos) {
+			viewport.scrollTop(pos + $('.sources', this.$el)[0].offsetTop);
+		},
+
 		render: function() {
 			var sources = _.groupBy(
 				this.model.get('recipes'),
@@ -61,12 +69,14 @@ $(function() {
 
 		onSwitchRecipe: function(event) {
 			var link = $(event.currentTarget);
+			var scrollPos = this.backupScrollPosition();
 
 			this.currentSource = link.attr('data-source');
 			this.currentRecipe = link.attr('data-recipe');
 
 			this.setElement(this.render().$el);
 			this.adjustSourcesWidth();
+			this.restoreScrollPosition(scrollPos);
 		}
 	});
 
