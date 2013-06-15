@@ -6,12 +6,13 @@ import json
 import posixpath
 import mimetypes
 import subprocess
-from collections import OrderedDict
+from urllib import urlencode
 import sphinxapi
 
 from werkzeug.wrappers import Request, Response
 from werkzeug.exceptions import HTTPException, NotFound, InternalServerError
 from werkzeug.routing import Map, Rule
+from werkzeug.urls import url_decode
 from werkzeug.utils import escape
 
 try:
@@ -28,6 +29,7 @@ SPHINX_PORT = getattr(settings, 'SPHINX_PORT', 9312)
 LESSC_OPTIONS = getattr(settings, 'LESSC_OPTIONS', [])
 
 STATIC_FILES_DIR = os.path.join(os.path.dirname(__file__), 'static')
+INDEX_FILE = os.path.join(os.path.dirname(__file__), os.path.pardir, 'sphinx', 'idx_recipes.spd')
 
 OPENSEARCH_TEMPLATE = '''\
 <?xml version="1.0"?>
@@ -116,41 +118,58 @@ class CocktailsApp(object):
 		return cocktails
 
 	def view_recipes(self, request):
+		index_updated = int(os.stat(INDEX_FILE).st_mtime)
+		if request.args.get('index_updated') != str(index_updated):
+			return Response(status=302, headers={
+				'Location': '/recipes?' + urlencode(
+					[('index_updated', index_updated)] +
+					[(k, v) for k, v
+						in url_decode(request.query_string, cls=iter)
+						if k != 'index_updated'
+					],
+					doseq=True
+				),
+			})
+
 		ingredients = [s for s in request.args.getlist('ingredient') if s.strip()]
 		cocktails = []
+		if ingredients:
+			try:
+				offset = int(request.args['offset'])
+			except (ValueError, KeyError):
+				offset = 0
 
-		if not ingredients:
-			return Response(json.dumps(cocktails), mimetype='application/json')
+			sphinx = sphinxapi.SphinxClient()
+			sphinx.SetServer(SPHINX_HOST, SPHINX_PORT)
+			sphinx.Open()
+			try:
+				result = self.query(sphinx, ingredients, offset)
+			finally:
+				sphinx.Close()
 
-		try:
-			offset = int(request.args['offset'])
-		except (ValueError, KeyError):
-			offset = 0
+			if result is None:
+				raise InternalServerError(sphinx.GetLastError())
 
-		sphinx = sphinxapi.SphinxClient()
-		sphinx.SetServer(SPHINX_HOST, SPHINX_PORT)
-		sphinx.Open()
-		try:
-			result = self.query(sphinx, ingredients, offset)
-		finally:
-			sphinx.Close()
+			for group in result:
+				recipes = []
+				for match in group:
+					recipes.append({
+						'title':       match['attrs']['title'],
+						'ingredients': match['attrs']['ingredients_text'].splitlines(),
+						'url':         match['attrs']['url'],
+						'picture_url': match['attrs']['picture'],
+						'source':      match['attrs']['source'],
+					})
+				cocktails.append({'recipes': recipes})
 
-		if result is None:
-			raise InternalServerError(sphinx.GetLastError())
-
-		for group in result:
-			recipes = []
-			for match in group:
-				recipes.append({
-					'title':       match['attrs']['title'],
-					'ingredients': match['attrs']['ingredients_text'].splitlines(),
-					'url':         match['attrs']['url'],
-					'picture_url': match['attrs']['picture'],
-					'source':      match['attrs']['source'],
-				})
-			cocktails.append({'recipes': recipes})
-
-		return Response(json.dumps(cocktails), mimetype='application/json')
+		return Response(
+			json.dumps({
+				'cocktails': cocktails,
+				'index_updated': index_updated,
+			}),
+			headers={'Cache-Control': 'public, max-age=31536000'},
+			mimetype='application/json'
+		)
 
 	def generate_css(self):
 		lessc = subprocess.Popen([

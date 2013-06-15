@@ -4,19 +4,23 @@ $(function() {
 	var SearchResults = Backbone.Collection.extend({
 		model: Cocktail,
 
-/*
-		initialize : function(models, options) {
-			this.ingredients = options.ingredients;
-		},
-*/
 		url: function() {
-			return '/recipes?' + $.param($.map(this.ingredients, function(x) {
-				return {name: 'ingredient', value: x};
-			}));
+			var params = [];
+
+			if (this.index_updated)
+				params.push({name: 'index_updated', value: this.index_updated});
+
+			for (var i = 0; i < this.ingredients.length; i++)
+				params.push({name: 'ingredient', value: this.ingredients[i]});
+
+			return '/recipes' + (params.length ? '?' + $.param(params) : '');
 		},
+
 		parse: function(resp, options) {
-			this.canLoadMore = resp.length > 0;
-			return resp;
+			this.canLoadMore = resp.cocktails.length > 0;
+			this.index_updated = resp.index_updated;
+
+			return resp.cocktails;
 		}
 	});
 
