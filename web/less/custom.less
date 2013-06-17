@@ -1,25 +1,26 @@
-.display-box(@width: 100%) {
-	display: -webkit-box;
-	display: -moz-box;
-	display: box;
-
-	// it's important to explicitly set a width (other than auto),
-	// because of if no width is specified (or when it is set to auto),
-	// webkit uses the full available width, while firefox uses as
-	// less width as possible like for block elements.
-	width: @width;
+.display-flex(@width: 100%) {
+	display: -webkit-flex;
+	display: flex;
 }
 
-.box-flex(@flex) {
-	-webkit-box-flex: @flex;
-	-moz-box-flex: @flex;
-	box-flex: @flex;
+.flex(@flex) {
+	-webkit-flex: @flex;
+	flex: @flex;
 }
 
-.box-orient(@orient) {
-	-webkit-box-orient: @orient;
-	-moz-box-orient: @orient;
-	box-orient: @orient;
+.flex-grow(@number) {
+	-webkit-flex-grow: @number;
+	flex-grow: @number;
+}
+
+.flex-basis(@size) {
+	-webkit-flex-basis: @size;
+	flex-basis: @size;
+}
+
+.flex-direction(@direction) {
+	-webkit-flex-direction: @direction;
+	flex-direction: @direction;
 }
 
 * {
@@ -75,7 +76,7 @@ li {
 }
 
 .cocktail {
-	.display-box(700px);
+	.display-flex;
 
 	padding-bottom: 2em;
 	position: relative;
@@ -95,15 +96,15 @@ li {
 }
 
 .details {
-	.box-flex(1);
+	.flex(1);
 }
 
 .ingredients-and-sources {
-	.display-box;
+	.display-flex;
 }
 
 .ingredients {
-	.box-flex(1);
+	.flex(0 1 380px);
 	margin-right: 1em;
 
 	li {
@@ -113,7 +114,7 @@ li {
 }
 
 .sources {
-	width: 130px;
+	.flex(1 0 130px);
 
 	li {
 		font-size: 0.9em;
@@ -152,7 +153,14 @@ li {
 
 	.cocktail {
 		padding-left: @sourcePaddingHorizontal;
-		width: 100%;
+	}
+
+	.ingredients {
+		.flex-grow(1);
+	}
+
+	.sources {
+		.flex-grow(0);
 	}
 
 	#github-ribbon {
@@ -166,10 +174,10 @@ li {
 	}
 
 	.ingredients-and-sources {
-		.box-orient(vertical);
+		.flex-direction(column);
 	}
 
-	.sources {
-		width: auto;
+	.ingredients, .sources {
+		.flex-basis(auto);
 	}
 }

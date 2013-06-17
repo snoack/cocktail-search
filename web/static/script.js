@@ -239,10 +239,10 @@ $(function() {
 	var adjustSourcesWidthOnResize = function() {
 		var width = document.width || window.innerWidth;
 
-		if (width > 580)
+		if (width > 580 && width <= 1000)
 			// the width of the sources stays constant at
-			// a document width of above 580px
-			var mediaQueryList = matchMedia('(min-width: 581px)');
+			// a document width of between 581px and 1000px
+			var mediaQueryList = matchMedia('(min-width: 581px) and (max-width: 1000px)');
 		else
 			var mediaQueryList = matchMedia('(width: ' + width + 'px)');
 
