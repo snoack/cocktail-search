@@ -168,7 +168,7 @@ $(function() {
 	};
 
 	var prepareField = function(field) {
-		field.keyup(function() {
+		field.on('input', function() {
 			var has_empty = false;
 			var new_state;
 
