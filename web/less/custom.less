@@ -1,25 +1,30 @@
-.display-flex(@width: 100%) {
+.display-flex() {
 	display: -webkit-flex;
+	display: -moz-flex;
 	display: flex;
 }
 
 .flex(@flex) {
 	-webkit-flex: @flex;
+	-moz-flex: @flex;
 	flex: @flex;
 }
 
 .flex-grow(@number) {
 	-webkit-flex-grow: @number;
+	-moz-flex-grow: @number;
 	flex-grow: @number;
 }
 
 .flex-basis(@size) {
 	-webkit-flex-basis: @size;
+	-moz-flex-basis: @size;
 	flex-basis: @size;
 }
 
 .flex-direction(@direction) {
 	-webkit-flex-direction: @direction;
+	-moz-flex-direction: @direction;
 	flex-direction: @direction;
 }
 
@@ -81,6 +86,10 @@ li {
 	padding-bottom: 2em;
 	position: relative;
 
+	a {
+		color: inherit;
+	}
+
 	&:last-child {
 		padding-bottom: 0;
 	}
@@ -141,6 +150,15 @@ li {
 	right: 0;
 }
 
+#firefox-warning {
+	margin-left: @searchFormWidth;
+	margin-right: 150px;
+
+	.alert {
+		margin: 1em;
+	}
+}
+
 @media (max-width: 1000px) {
 	#search-form {
 		position: static;
@@ -165,6 +183,10 @@ li {
 
 	#github-ribbon {
 		display: none;
+	}
+
+	#firefox-warning {
+		margin: 0;
 	}
 }
 
