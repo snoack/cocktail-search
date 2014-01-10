@@ -13,3 +13,6 @@ ginger beer > ginger
 cointreau > triple sec
 triple sec > orange curacao
 monkey 47 > gin
+pinot noir > red wine
+pinot grigio > white wine
+lager > beer
