@@ -8,9 +8,12 @@ unescape = HTMLParser().unescape
 
 def html_to_text(s):
 	# strip tags
-	s = re.sub(r'<[^>]*?>', '', s)
+	s = re.sub(r'<\W*(?:b|big|i|small|tt|abbr|acronym|cite|code|dfn|em|kbd|strong|samp|var|a|bdo|q|span|sub|sup)\b[^>]*?>', '', s, flags=re.I)
+	s = re.sub(r'<[^>]*?>', ' ', s)
 	# replace entities
 	s = unescape(s)
+	# strip leading and trailing spaces
+	s = s.strip()
 	# replace all sequences of subsequent whitespaces with a single space
 	s = re.sub(r'\s+', ' ', s)
 	return s
