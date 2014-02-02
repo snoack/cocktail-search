@@ -39,6 +39,39 @@ OPENSEARCH_TEMPLATE = '''\
 </OpenSearchDescription>
 '''
 
+JSLICENSE_TEMPLATE = '''\
+<!DOCTYPE html>
+<html>
+<head>
+<title>Cocktail search | JavaScript License Information</title>
+</head>
+<body>
+<table id="jslicense-labels1">
+<tr>
+<td><a href="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">jquery.min.js</a></td>
+<td><a href="http://www.jclark.com/xml/copying.txt">Expat</a></td>
+<td><a href="https://github.com/jquery/jquery/archive/1.9.1.zip">jquery-1.9.1.zip</a></td>
+</tr>
+<tr>
+<td><a href="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js">underscore-min.js</a></td>
+<td><a href="http://www.jclark.com/xml/copying.txt">Expat</a></td>
+<td><a href="https://github.com/jashkenas/underscore/archive/1.4.4.zip">underscore-1.4.4.zip</a></td>
+</tr>
+<tr>
+<td><a href="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js">backbone-min.js</a></td>
+<td><a href="http://www.jclark.com/xml/copying.txt">Expat</a></td>
+<td><a href="https://github.com/jashkenas/backbone/archive/1.0.0.zip">backbone-1.0.0.zip</a></td>
+</tr>
+<tr>
+<td><a href="%(site_url)sstatic/script.js">script.js</a></td>
+<td><a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0</a></td>
+<td><a href="%(site_url)sstatic/script.js">script.js</a></td>
+</tr>
+</table>
+</body>
+</html>
+'''
+
 class CocktailsApp(object):
 	urls = Map([
 		Rule('/recipes', endpoint='recipes'),
@@ -47,6 +80,7 @@ class CocktailsApp(object):
 	generated_files = {
 		'all.css': 'css',
 		'opensearch.xml': 'open_search_description',
+		'jslicense.html': 'jslicense',
 	}
 
 	def make_query(self, sphinx, ingredients):
@@ -190,6 +224,9 @@ class CocktailsApp(object):
 
 	def generate_open_search_description(self):
 		return [OPENSEARCH_TEMPLATE % {'site_url': SITE_URL}]
+
+	def generate_jslicense(self):
+		return [JSLICENSE_TEMPLATE % {'site_url': SITE_URL}]
 
 	def cmd_runserver(self, listen='8000'):
 		from werkzeug.serving import run_simple
