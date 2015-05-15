@@ -61,9 +61,9 @@ don't run the crawler unless absolutely necessary, for example when you have to
 test a spider, that you have just added or modified. For any other case, I made
 the files with the cocktail recipes I have already crawled available for you::
 
-    wget -r -A .json http://cocktails.djacap.net/dumps/
-    mv cocktails.djacap.net/dumps/* crawler/
-    rm -r cocktails.djacap.net
+    wget -r -A .json http://cocktails.etrigg.com/dumps/
+    mv cocktails.etrigg.com/dumps/* crawler/
+    rm -r cocktails.etrigg.com
 
 However following command will run the crawler for a given spider::
 
@@ -111,7 +111,7 @@ Configuring the web app
 
 Create the file *web/settings.py* and set follwing options::
 
-    SITE_URL = 'http://cocktails.djacap.net/'
+    SITE_URL = 'http://cocktails.etrigg.com/'
     LESSC_OPTIONS = ['--compress']
 
 
@@ -121,7 +121,7 @@ Configuring Apache
 ::
 
         <VirtualHost *:80>
-                ServerName cocktails.djacap.net
+                ServerName cocktails.etrigg.com
 
                 WSGIDaemonProcess cocktails [processes=<num>] [python-path=<path to environment>/lib/python2.7/site-packages]
                 WSGIProcessGroup  cocktails
@@ -193,7 +193,7 @@ You have found a bug and don't want to fix it yourself. Or you have an awesome
 idea to improve the cocktail search? That's great. Please send me an email or
 even better `use the issue tracker`_.
 
-.. _demo: http://cocktails.djacap.net/
+.. _demo: http://cocktails.etrigg.com/
 .. _virtual environment: http://www.virtualenv.org/
 .. _werkzeug: http://www.pocoo.org/projects/werkzeug/
 .. _scrapy: http://scrapy.org/
