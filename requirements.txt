@@ -1,3 +1,3 @@
 Scrapy>=0.14
 Werkzeug>=0.8
--e git+https://github.com/wallunit/snowball_py.git#egg=snowballstemmer
+snowballstemmer>=1.2.0
