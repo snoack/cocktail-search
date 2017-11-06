@@ -21,35 +21,35 @@ will be otherwise empty::
 
 Clone the repository and its submodules::
 
-    git clone https://github.com/wallunit/cocktail-search
+    git clone https://github.com/snoack/cocktail-search
     cd cocktail-search
-    git submodule init
-    git submodule update
+    git submodule update --init
 
 
 Installing dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~
 
-There is a script that creates a `virtual environment`_ and installs all
-dependencies into the environment. Assuming you have virtualenv and pip already
-installed and that you have created the directory, that became the parent
-directory of the repository, as described in the previous section, run following
-command::
+Following programs need to be installed:
 
-    ./bootstrap-virtualenv.sh ..
+* Python 2.7
+* `Sphinx`_
+* `Less`_
+* `virtualenvwrapper`_ (optional)
 
-If it still fails, it is most likely because of you are missing a development
-package required to build one of the dependencies. In that case install the
-missing package and start over.
+On Debian/Ubuntu, you can install these with following command::
 
-Make sure that the virtual environment is active before you run scrapy, searchd,
-indexer or app.py. You can activate the virtual environment like that::
+    apt-get install sphinxsearch node-less virtualenvwrapper
 
-    source ../bin/activate
+Assuming you use ``virtualenvwrapper`` (recommended for development), you can
+create a virtualenv, and install the required Python modules in there, like that::
 
-Alternatively you can install the dependencies system-wide. For the Python
-packages have a look at *requirements.txt* or just run ``pip install -r requirements.txt``.
-For the other dependencies have a look at the contents of *bootstrap-virtualenv.sh*.
+    mkvirtualenv -r requirements.txt cocktail-search
+    wget https://raw.githubusercontent.com/sphinxsearch/sphinx/master/api/sphinxapi.py -O "$VIRTUAL_ENV/lib/python2.7/site-packages/sphinxapi.py"
+
+Make sure that the virtualenv is active before you run ``scrapy``, ``indexer``
+or ``app.py``. You can activate the virtual environment like that::
+
+    workon cocktail-search
 
 
 Crawling
@@ -65,13 +65,13 @@ the files with the cocktail recipes I have already crawled available for you::
     mv cocktails.etrigg.com/dumps/* crawler/
     rm -r cocktails.etrigg.com
 
-However following command will run the crawler for a given spider::
+Anyway, following command will run the crawler for a given spider::
 
     cd crawler
     rm -f <spider>.json
     scrapy crawl <spider> -o <spider>.json
 
-Note that when the output file already exist, scrapy will append scraped recipes
+Note that when the output file already exist, Scrapy will append scraped recipes
 at the bottom of the existing file. So make sure you delete it before.
 
 
@@ -161,47 +161,41 @@ Build the index and start the search daemon::
     indexer --all
     searchd
 
-Note that we omitted the ``--console`` option, in order to make searchd run in the
-background. However instead of just calling searchd on the command line, it
-would be even better to set up an init script to start and stop Sphinx.
+Note that we omitted the ``--console`` option, in order to make searchd run in
+the background. However instead of just calling searchd on the command line,
+it would be even better to set up an init script to start and stop Sphinx.
 
 There is rarely a need to restart the search daemon. When you have deployed a
-new version of the cocktail search or when you ran the crawler again, just
-rebuilt and rotate the index::
+new version or when you ran the crawler again, just rebuilt and rotate the index::
 
     cd sphinx
     indexer --all --rotate
 
 
-Getting involved
-----------------
+Contributing
+------------
 
 This project is my playground for new web technologies and frameworks. And you
 are invited to make it your playground as well. The code base is still small and
-well organized. And setting up the development environment is easy and
-straightforward. 
+well organized. And setting up the development environment is fairly easy.
 
-The easiest way to get involved would probably be to write `spiders`_ for more
+The easiest way to get started would probably be to write `spiders`_ for more
 cocktail websites. Most spiders consists only of a few lines of Python code and
 you don't have to know anything about the rest of the stack. Or you could
-contribute to the `wordforms`_ and `synonyms`_ lists, without even any
-programming skills. Also have a look at the `open issues`_ and feel free to fix
-some of them. I prefer to get pull requests via github, but will also accept
-patches via email.
+contribute to the `wordforms`_ and `synonyms`_ lists, even without any
+programming skills. But you are also welcome to pick up any `open issue`_.
+I prefer to get pull requests via GitHub, but will also accept patches via email.
 
-You have found a bug and don't want to fix it yourself. Or you have an awesome
-idea to improve the cocktail search? That's great. Please send me an email or
-even better `use the issue tracker`_.
+You have found a bug and don't want to fix it yourself, or you have an awesome
+idea to improve the cocktail search? That's great too. Please send me an email
+or even better `submit an issue`_.
 
 .. _demo: http://cocktails.etrigg.com/
-.. _virtual environment: http://www.virtualenv.org/
-.. _werkzeug: http://www.pocoo.org/projects/werkzeug/
-.. _scrapy: http://scrapy.org/
 .. _Sphinx: http://sphinxsearch.com/
-.. _less: http://lesscss.org/
-.. _install node.js: https://github.com/joyent/node/wiki/Installing-Node.js-via-package-manager
-.. _spiders: https://github.com/wallunit/cocktail-search/tree/master/crawler/cocktails/spiders
-.. _wordforms: https://github.com/wallunit/cocktail-search/blob/master/sphinx/wordforms.txt
-.. _synonyms: https://github.com/wallunit/cocktail-search/blob/master/sphinx/synonyms.txt
-.. _open issues: https://github.com/wallunit/cocktail-search/issues?state=open
-.. _use the issue tracker: https://github.com/wallunit/cocktail-search/issues/new
+.. _Less: http://lesscss.org/
+.. _virtualenvwrapper: https://virtualenvwrapper.readthedocs.io/
+.. _spiders: https://github.com/snoack/cocktail-search/tree/master/crawler/cocktails/spiders
+.. _wordforms: https://github.com/snoack/cocktail-search/blob/master/sphinx/wordforms.txt
+.. _synonyms: https://github.com/snoack/cocktail-search/blob/master/sphinx/synonyms.txt
+.. _open issue: https://github.com/snoack/cocktail-search/issues?state=open
+.. _submit an issue: https://github.com/snoack/cocktail-search/issues/new
