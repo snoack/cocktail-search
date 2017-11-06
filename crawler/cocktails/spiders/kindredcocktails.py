@@ -9,6 +9,7 @@ from cocktails.utils import html_to_text
 
 xp_ingredients = css_to_xpath('.cocktail-ingredients tr')
 
+
 class KindredCocktails(CrawlSpider):
     name = 'kindredcocktails'
     allowed_domains = ['www.kindredcocktails.com']

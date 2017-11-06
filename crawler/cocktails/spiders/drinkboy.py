@@ -11,35 +11,36 @@ from cocktails.utils import html_to_text
 
 xp_ingredients = css_to_xpath('.ingredient')
 
+
 class DrinkBoySpider(CrawlSpider):
-	name = 'drinkboy'
-	allowed_domains = ['www.drinkboy.com']
-	start_urls = ['http://www.drinkboy.com/Cocktails/']
+    name = 'drinkboy'
+    allowed_domains = ['www.drinkboy.com']
+    start_urls = ['http://www.drinkboy.com/Cocktails/']
 
-	rules = (
-		Rule(SgmlLinkExtractor(allow=r'/Cocktails/Recipe.aspx'), callback='parse_recipe'),
-	)
+    rules = (
+        Rule(SgmlLinkExtractor(allow=r'/Cocktails/Recipe.aspx'), callback='parse_recipe'),
+    )
 
-	def parse_recipe(self, response):
-		hxs = HtmlXPathSelector(response)
+    def parse_recipe(self, response):
+        hxs = HtmlXPathSelector(response)
 
-		for title in hxs.select("//*[@itemprop='name']").extract():
-			break
-		else:
-			return []
+        for title in hxs.select("//*[@itemprop='name']").extract():
+            break
+        else:
+            return []
 
-		for picture in hxs.select("//img[@itemprop='image']/@src").extract():
-			picture = urljoin(response.url, picture)
-			break
-		else:
-			picture = None
+        for picture in hxs.select("//img[@itemprop='image']/@src").extract():
+            picture = urljoin(response.url, picture)
+            break
+        else:
+            picture = None
 
-		ingredients = hxs.select(xp_ingredients).extract()
+        ingredients = hxs.select(xp_ingredients).extract()
 
-		return [CocktailItem(
-			title=html_to_text(title),
-			picture=picture,
-			url=response.url,
-			source='DrinkBoy',
-			ingredients=[html_to_text(x) for x in ingredients],
-		)]
+        return [CocktailItem(
+            title=html_to_text(title),
+            picture=picture,
+            url=response.url,
+            source='DrinkBoy',
+            ingredients=[html_to_text(x) for x in ingredients],
+        )]

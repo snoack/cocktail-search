@@ -6,63 +6,66 @@ from scrapy.selector import XPathSelector
 
 unescape = HTMLParser().unescape
 
+
 def html_to_text(s):
-	# strip tags
-	s = re.sub(r'<\W*(?:b|big|i|small|tt|abbr|acronym|cite|code|dfn|em|kbd|strong|samp|var|a|bdo|q|span|sub|sup)\b[^>]*?>', '', s, flags=re.I)
-	s = re.sub(r'<[^>]*?>', ' ', s)
-	# replace entities
-	s = unescape(s)
-	# strip leading and trailing spaces
-	s = s.strip()
-	# replace all sequences of subsequent whitespaces with a single space
-	s = re.sub(r'\s+', ' ', s)
-	return s
+    # strip tags
+    s = re.sub(r'<\W*(?:b|big|i|small|tt|abbr|acronym|cite|code|dfn|em|kbd|strong|samp|var|a|bdo|q|span|sub|sup)\b[^>]*?>', '', s, flags=re.I)
+    s = re.sub(r'<[^>]*?>', ' ', s)
+    # replace entities
+    s = unescape(s)
+    # strip leading and trailing spaces
+    s = s.strip()
+    # replace all sequences of subsequent whitespaces with a single space
+    s = re.sub(r'\s+', ' ', s)
+    return s
+
 
 def split_at_br(hxs, include_blank=False, newline_elements=['br']):
-	nodes = hxs.select('|'.join('descendant-or-self::' + el for el in newline_elements + ['text()']))
-	snippets = []
-	rv = []
+    nodes = hxs.select('|'.join('descendant-or-self::' + el for el in newline_elements + ['text()']))
+    snippets = []
+    rv = []
 
-	while True:
-		node = nodes.pop(0) if nodes else None
+    while True:
+        node = nodes.pop(0) if nodes else None
 
-		if node and node.xmlNode.name not in newline_elements:
-			snippets.append(node.extract())
-			continue
+        if node and node.xmlNode.name not in newline_elements:
+            snippets.append(node.extract())
+            continue
 
-		s = ''.join(snippets).strip()
-		snippets = []
+        s = ''.join(snippets).strip()
+        snippets = []
 
-		if s or include_blank:
-			rv.append(s)
+        if s or include_blank:
+            rv.append(s)
 
-		if not node:
-			return rv
+        if not node:
+            return rv
+
 
 def extract_extra_ingredients(nodes, is_section_header):
-	section = None
-	sections = OrderedDict()
+    section = None
+    sections = OrderedDict()
 
-	for node in nodes:
-		text = node.extract() if isinstance(node, XPathSelector) else node
-		text = html_to_text(text).strip()
+    for node in nodes:
+        text = node.extract() if isinstance(node, XPathSelector) else node
+        text = html_to_text(text).strip()
 
-		if not text:
-			continue
+        if not text:
+            continue
 
-		if is_section_header(node):
-			section = text
-			continue
+        if is_section_header(node):
+            section = text
+            continue
 
-		sections.setdefault(section, []).append(text)
+        sections.setdefault(section, []).append(text)
 
-	if None in sections:
-		ingredients = sections.pop(None)
-	elif sections:
-		ingredients = sections.pop(list(sections)[-1])
-	else:
-		ingredients = []
+    if None in sections:
+        ingredients = sections.pop(None)
+    elif sections:
+        ingredients = sections.pop(list(sections)[-1])
+    else:
+        ingredients = []
 
-	extra_ingredients = [x for y in sections.values() for x in y]
+    extra_ingredients = [x for y in sections.values() for x in y]
 
-	return (ingredients, extra_ingredients)
+    return (ingredients, extra_ingredients)
