@@ -1,16 +1,16 @@
 from urllib.parse import urljoin
 
-from scrapy.contrib.spiders import CrawlSpider, Rule
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy.linkextractors import LinkExtractor
 from scrapy.selector import HtmlXPathSelector
 
-from lxml.cssselect import css_to_xpath
+from lxml.cssselect import CSSSelector
 
 from cocktails.items import CocktailItem
 from cocktails.utils import html_to_text
 
-xp_header = css_to_xpath('.header') + '/text()'
-xp_ingredients = css_to_xpath('.story') + ("[1]//text()["
+xp_header = CSSSelector('.header').path + '/text()'
+xp_ingredients = CSSSelector('.story').path + ("[1]//text()["
     "preceding::text()["
         "normalize-space(self::text()) = 'Ingredients:'"
     "]"
@@ -31,7 +31,7 @@ class CocktailTimesSpider(CrawlSpider):
 
     rules = (
         Rule(
-            SgmlLinkExtractor(
+            LinkExtractor(
                 allow=(
                     r'/whiskey/.+',
                     r'/bourbon/.+',
@@ -50,7 +50,7 @@ class CocktailTimesSpider(CrawlSpider):
             callback='parse_recipe',
             follow=True
         ),
-        Rule(SgmlLinkExtractor(allow=r'.*')),
+        Rule(LinkExtractor(allow=r'.*')),
     )
 
     def parse_recipe(self, response):

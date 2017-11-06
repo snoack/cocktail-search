@@ -1,16 +1,16 @@
 import re
 
-from scrapy.contrib.spiders import CrawlSpider, Rule
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy.linkextractors import LinkExtractor
 from scrapy.selector import HtmlXPathSelector
 
-from lxml.cssselect import css_to_xpath
+from lxml.cssselect import CSSSelector
 
 from cocktails.items import CocktailItem
 from cocktails.utils import html_to_text
 
-xp_title = css_to_xpath('.recipe_title')
-xp_ingredients = css_to_xpath('.ingredient')
+xp_title = CSSSelector('.recipe_title').path
+xp_ingredients = CSSSelector('.ingredient').path
 
 
 class DrinksMixerSpider(CrawlSpider):
@@ -19,8 +19,8 @@ class DrinksMixerSpider(CrawlSpider):
     start_urls = ['http://www.drinksmixer.com/']
 
     rules = (
-        Rule(SgmlLinkExtractor(allow=r'/drink[^/]+.html$'), callback='parse_recipe'),
-        Rule(SgmlLinkExtractor(allow=r'/cat/')),
+        Rule(LinkExtractor(allow=r'/drink[^/]+.html$'), callback='parse_recipe'),
+        Rule(LinkExtractor(allow=r'/cat/')),
     )
 
     def parse_recipe(self, response):

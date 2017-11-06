@@ -5,14 +5,14 @@ from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-from lxml.cssselect import css_to_xpath
+from lxml.cssselect import CSSSelector
 
 from cocktails.items import CocktailItem
 from cocktails.utils import extract_extra_ingredients
 
 URL = 'http://www.seriouseats.com/topics/search?index=recipe&count=200&term=c|cocktails'
 
-xp_ingredients = css_to_xpath('.ingredient')
+xp_ingredients = CSSSelector('.ingredient').path
 
 
 class SeriouseatsSpider(BaseSpider):

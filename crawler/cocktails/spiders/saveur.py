@@ -4,13 +4,13 @@ from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-from lxml.cssselect import css_to_xpath
+from lxml.cssselect import CSSSelector
 
 from cocktails.items import CocktailItem
 from cocktails.utils import html_to_text, split_at_br, extract_extra_ingredients
 
-xp_recipe_links = css_to_xpath('.SolrResultTitle a') + '/@href'
-xp_next_link = css_to_xpath('.SolrPageNext a') + '/@href'
+xp_recipe_links = CSSSelector('.SolrResultTitle a').path + '/@href'
+xp_next_link = CSSSelector('.SolrPageNext a').path + '/@href'
 
 
 class SaveurSpider(BaseSpider):

@@ -6,12 +6,12 @@ from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-from lxml.cssselect import css_to_xpath
+from lxml.cssselect import CSSSelector
 
 from cocktails.items import CocktailItem
 from cocktails.utils import html_to_text
 
-xp_recipe_links = css_to_xpath('.cocktail') + '//a[1]/@href'
+xp_recipe_links = CSSSelector('.cocktail').path + '//a[1]/@href'
 
 
 class OhGoshSpider(BaseSpider):

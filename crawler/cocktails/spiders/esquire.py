@@ -1,14 +1,14 @@
 from urllib.parse import urljoin
 
-from scrapy.contrib.spiders import SitemapSpider
+from scrapy.spiders import SitemapSpider
 from scrapy.selector import HtmlXPathSelector
 
-from lxml.cssselect import css_to_xpath
+from lxml.cssselect import CSSSelector
 
 from cocktails.items import CocktailItem
 from cocktails.utils import html_to_text, unescape
 
-xp_ingredient = css_to_xpath('.ingredient')
+xp_ingredient = CSSSelector('.ingredient').path
 
 
 class EsquireSpider(SitemapSpider):

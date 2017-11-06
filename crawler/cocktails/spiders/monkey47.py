@@ -4,14 +4,14 @@ from scrapy.spider import BaseSpider
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-from lxml.cssselect import css_to_xpath
+from lxml.cssselect import CSSSelector
 
 from cocktails.items import CocktailItem
 from cocktails.utils import html_to_text, split_at_br
 
-xp_title = css_to_xpath('.entry-title')
-xp_ingredients = css_to_xpath('.entry-content p') + '[1]'
-xp_previous_link = css_to_xpath('.nav-previous a') + '/@href'
+xp_title = CSSSelector('.entry-title').path
+xp_ingredients = CSSSelector('.entry-content p').path + '[1]'
+xp_previous_link = CSSSelector('.nav-previous a').path + '/@href'
 
 
 class Monkey47Spider(BaseSpider):

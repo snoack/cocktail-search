@@ -1,17 +1,17 @@
 from urllib.parse import urljoin
 
-from scrapy.contrib.spiders import CrawlSpider, Rule
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy.linkextractors import LinkExtractor
 from scrapy.http import Request
 from scrapy.selector import HtmlXPathSelector
 
-from lxml.cssselect import css_to_xpath
+from lxml.cssselect import CSSSelector
 
 from cocktails.items import CocktailItem
 from cocktails.utils import html_to_text
 
-xp_recipes = css_to_xpath('.hrecipe')
-xp_ingredients = css_to_xpath('.ingredient li')
+xp_recipes = CSSSelector('.hrecipe').path
+xp_ingredients = CSSSelector('.ingredient li').path
 
 
 class WikipediaSpider(CrawlSpider):
@@ -20,9 +20,9 @@ class WikipediaSpider(CrawlSpider):
     start_urls = ['http://en.wikipedia.org/wiki/List_of_cocktails']
 
     rules = (
-        Rule(SgmlLinkExtractor(allow=(r'/wiki/Category:Cocktails(\b|_)'))),
-        Rule(SgmlLinkExtractor(allow=(r'/wiki/Category:.+(\b|_)drinks?(\b|_)'))),
-        Rule(SgmlLinkExtractor(allow=(r'/wiki/[^:]+$')), callback='parse_recipes'),
+        Rule(LinkExtractor(allow=(r'/wiki/Category:Cocktails(\b|_)'))),
+        Rule(LinkExtractor(allow=(r'/wiki/Category:.+(\b|_)drinks?(\b|_)'))),
+        Rule(LinkExtractor(allow=(r'/wiki/[^:]+$')), callback='parse_recipes'),
     )
 
     def parse_recipes(self, response):

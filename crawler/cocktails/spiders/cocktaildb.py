@@ -1,13 +1,13 @@
-from scrapy.contrib.spiders import CrawlSpider, Rule
-from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
+from scrapy.spiders import CrawlSpider, Rule
+from scrapy.linkextractors import LinkExtractor
 from scrapy.selector import HtmlXPathSelector
 
-from lxml.cssselect import css_to_xpath
+from lxml.cssselect import CSSSelector
 
 from cocktails.items import CocktailItem
 from cocktails.utils import html_to_text
 
-xp_ingredients = css_to_xpath('.recipeMeasure')
+xp_ingredients = CSSSelector('.recipeMeasure').path
 
 
 class CocktailDbSpider(CrawlSpider):
@@ -16,8 +16,8 @@ class CocktailDbSpider(CrawlSpider):
     start_urls = ['http://www.cocktaildb.com']
 
     rules = (
-        Rule(SgmlLinkExtractor(allow=r'/recipe_detail\b'), callback='parse_recipe'),
-        Rule(SgmlLinkExtractor(allow=r'.*')),
+        Rule(LinkExtractor(allow=r'/recipe_detail\b'), callback='parse_recipe'),
+        Rule(LinkExtractor(allow=r'.*')),
     )
 
     def parse_recipe(self, response):
