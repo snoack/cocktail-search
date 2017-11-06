@@ -1,5 +1,5 @@
 import re
-from HTMLParser import HTMLParser
+from html.parser import HTMLParser
 from collections import OrderedDict
 
 from scrapy.selector import XPathSelector
@@ -59,7 +59,7 @@ def extract_extra_ingredients(nodes, is_section_header):
 	if None in sections:
 		ingredients = sections.pop(None)
 	elif sections:
-		ingredients = sections.pop(sections.keys()[-1])
+		ingredients = sections.pop(list(sections)[-1])
 	else:
 		ingredients = []
 

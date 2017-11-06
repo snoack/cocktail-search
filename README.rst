@@ -31,8 +31,8 @@ Installing dependencies
 
 Following programs need to be installed:
 
-* Python 2.7
-* `Sphinx`_
+* Python >=3.3
+* `Sphinx`_ >=2.2.11
 * `Less`_
 * `virtualenvwrapper`_ (optional)
 
@@ -43,8 +43,7 @@ On Debian/Ubuntu, you can install these with following command::
 Assuming you use ``virtualenvwrapper`` (recommended for development), you can
 create a virtualenv, and install the required Python modules in there, like that::
 
-    mkvirtualenv -r requirements.txt cocktail-search
-    wget https://raw.githubusercontent.com/sphinxsearch/sphinx/master/api/sphinxapi.py -O "$VIRTUAL_ENV/lib/python2.7/site-packages/sphinxapi.py"
+    mkvirtualenv -p $(which python3) -r requirements.txt cocktail-search
 
 Make sure that the virtualenv is active before you run ``scrapy``, ``indexer``
 or ``app.py``. You can activate the virtual environment like that::
@@ -123,7 +122,7 @@ Configuring Apache
         <VirtualHost *:80>
                 ServerName cocktails.etrigg.com
 
-                WSGIDaemonProcess cocktails [processes=<num>] [python-path=<path to environment>/lib/python2.7/site-packages]
+                WSGIDaemonProcess cocktails [processes=<num>] [python-path=<path to environment>/lib/python<version>/site-packages]
                 WSGIProcessGroup  cocktails
                 WSGIScriptAlias   / <path to repository>/web/app.wsgi
 

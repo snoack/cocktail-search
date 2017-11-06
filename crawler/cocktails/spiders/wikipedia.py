@@ -1,4 +1,4 @@
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor
@@ -55,5 +55,5 @@ class WikipediaSpider(CrawlSpider):
 				picture=picture,
 				url=response.url,
 				source='Wikipedia',
-				ingredients=map(html_to_text, ingredients)
+				ingredients=[html_to_text(x) for x in ingredients]
 			)

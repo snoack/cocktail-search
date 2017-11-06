@@ -1,4 +1,4 @@
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from scrapy.contrib.spiders import CrawlSpider, Rule
 from scrapy.contrib.linkextractors.sgml import SgmlLinkExtractor

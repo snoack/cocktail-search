@@ -34,5 +34,5 @@ class CocktailDbSpider(CrawlSpider):
 			picture=None,
 			url=response.url,
 			source='CocktailDB',
-			ingredients=map(html_to_text, ingredients),
+			ingredients=[html_to_text(x) for x in ingredients],
 		)]

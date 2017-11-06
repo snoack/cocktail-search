@@ -34,5 +34,5 @@ class KindredCocktails(CrawlSpider):
             picture=None,
             url=response.url,
             source='Kindred Cocktails',
-            ingredients=map(html_to_text, ingredients),
+            ingredients=[html_to_text(x) for x in ingredients],
         )]

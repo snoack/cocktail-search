@@ -37,5 +37,5 @@ class DrinksMixerSpider(CrawlSpider):
 			picture=None,
 			url=response.url,
 			source='Drinks Mixer',
-			ingredients=map(html_to_text, ingredients),
+			ingredients=[html_to_text(x) for x in ingredients],
 		)]

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import os
 import re
@@ -6,7 +6,7 @@ import json
 import posixpath
 import mimetypes
 import subprocess
-from urllib import urlencode
+from urllib.parse import urlencode
 import sphinxapi
 
 from werkzeug.wrappers import Request, Response
@@ -98,7 +98,7 @@ class CocktailsApp(object):
 				if quoted:
 					words.extend(quoted)
 				if unquoted:
-					keywords = sphinx.BuildKeywords(unquoted.encode('utf-8'), 'recipes', 0)
+					keywords = sphinx.BuildKeywords(unquoted, 'recipes', 0)
 					if keywords is None:
 						return None
 					for kw in keywords:
@@ -206,21 +206,12 @@ class CocktailsApp(object):
 		)
 
 	def generate_css(self):
-		lessc = subprocess.Popen([
-			'lessc',
-		] + LESSC_OPTIONS + [
-			os.path.join(
-				os.path.dirname(__file__),
-				'less',
-				'all.less'
-			)
-		], stdout=subprocess.PIPE)
+		args = ['lessc']
+		args.extend(LESSC_OPTIONS)
+		args.append(os.path.join(os.path.dirname(__file__), 'less', 'all.less'))
 
-		for line in lessc.stdout:
-			yield line
-
-		lessc.stdout.close()
-		lessc.wait()
+		with subprocess.Popen(args, stdout=subprocess.PIPE) as lessc:
+			yield from lessc.stdout
 
 	def generate_open_search_description(self):
 		return [OPENSEARCH_TEMPLATE % {'site_url': SITE_URL}]
@@ -259,14 +250,16 @@ class CocktailsApp(object):
 		})
 
 	def cmd_deploy(self):
-		for path, endpoint in self.generated_files.iteritems():
-			print 'Generating ' + path
+		for path, endpoint in self.generated_files.items():
+			print('Generating ' + path)
 
 			iterable = getattr(self, 'generate_' + endpoint)()
 			path = os.path.join(STATIC_FILES_DIR, *posixpath.split(path))
 
 			with open(path, 'wb') as outfile:
 				for data in iterable:
+					if isinstance(data, str):
+						data = data.encode('utf-8')
 					outfile.write(data)
 
 	def dispatch_request(self, request):
@@ -274,9 +267,9 @@ class CocktailsApp(object):
 		try:
 			endpoint, values = adapter.match()
 			return getattr(self, 'view_' + endpoint)(request, **values)
-		except NotFound, e:
+		except NotFound as e:
 			return Response(status=404)
-		except HTTPException, e:
+		except HTTPException as e:
 			return e
 
 	def call_command(self, command, args):

@@ -1,11 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import sys
 import os
 import json
 import re
 from unicodedata import normalize
-from itertools import imap, groupby
+from itertools import groupby
 from difflib import SequenceMatcher
 
 from werkzeug.utils import escape
@@ -17,7 +17,6 @@ except ImportError:
 	# http://snowball.tartarus.org/wrappers/guide.html
 	from Stemmer import Stemmer as stemmer
 
-ee = lambda s: escape(s).encode('utf-8')
 stemmer_en = stemmer('english')
 
 def normalize_title(s):
@@ -40,7 +39,7 @@ def load_synonyms():
 
 	with open(os.path.join(os.path.dirname(__file__), 'synonyms.txt')) as f:
 		for line in f:
-			a, b = line.decode('utf-8').split('>')
+			a, b = line.split('>')
 
 			a = a.strip().lower()
 			b = b.strip()
@@ -51,7 +50,7 @@ def load_synonyms():
 
 def compile_synonyms():
 	synonyms = load_synonyms()
-	regex = re.compile(r'\b(?:%s)\b' % '|'.join(imap(re.escape, synonyms)), re.I)
+	regex = re.compile(r'\b(?:%s)\b' % '|'.join(map(re.escape, synonyms)), re.I)
 
 	def expand(s):
 		yield s
@@ -65,18 +64,18 @@ def compile_synonyms():
 expand_synonyms = compile_synonyms()
 
 def xmlpipe():
-	print '<?xml version="1.0" encoding="utf-8"?>'
-	print '<sphinx:docset>'
+	print('<?xml version="1.0" encoding="utf-8"?>')
+	print('<sphinx:docset>')
 
-	print '<sphinx:schema>'
-	print '<sphinx:field name="title" attr="string"/>'
-	print '<sphinx:field name="title_normalized" attr="string"/>'
-	print '<sphinx:field name="ingredients"/>'
-	print '<sphinx:attr name="url" type="string"/>'
-	print '<sphinx:attr name="source" type="string"/>'
-	print '<sphinx:attr name="picture" type="string"/>'
-	print '<sphinx:attr name="ingredients_text" type="string"/>'
-	print '</sphinx:schema>'
+	print('<sphinx:schema>')
+	print('<sphinx:field name="title" attr="string"/>')
+	print('<sphinx:field name="title_normalized" attr="string"/>')
+	print('<sphinx:field name="ingredients"/>')
+	print('<sphinx:attr name="url" type="string"/>')
+	print('<sphinx:attr name="source" type="string"/>')
+	print('<sphinx:attr name="picture" type="string"/>')
+	print('<sphinx:attr name="ingredients_text" type="string"/>')
+	print('</sphinx:schema>')
 
 	unique = False
 	i = 1
@@ -91,38 +90,38 @@ def xmlpipe():
 			continue
 
 		with open(arg) as file:
-			items = imap(json.loads, file)
+			items = map(json.loads, file)
 
 			if unique:
 				items = drop_duplicates(items)
 
 			for item in items:
-				print '<sphinx:document id="%d">' % i
-				print '<title>%s</title>' % ee(item['title'])
-				print '<url>%s</url>' % ee(item['url'])
-				print '<source>%s</source>' % ee(item['source'])
+				print('<sphinx:document id="%d">' % i)
+				print('<title>%s</title>' % escape(item['title']))
+				print('<url>%s</url>' % escape(item['url']))
+				print('<source>%s</source>' % escape(item['source']))
 
 				if item['picture']:
-					print '<picture>%s</picture>' % ee(item['picture'])
+					print('<picture>%s</picture>' % escape(item['picture']))
 
-				print '<title_normalized>%s</title_normalized>' % ee(
+				print('<title_normalized>%s</title_normalized>' % escape(
 					normalize_title(item['title'])
-				)
+				))
 
-				print '<ingredients>%s</ingredients>' % ee('!'.join(
+				print('<ingredients>%s</ingredients>' % escape('!'.join(
 					re.sub(r'[.!?\s]+', ' ', expand_synonyms(x))
 						for y in (item['ingredients'], item.get('extra_ingredients', []))
 						for x in y
-				))
+				)))
 
-				print '<ingredients_text>%s</ingredients_text>' % ee('\n'.join(
+				print('<ingredients_text>%s</ingredients_text>' % escape('\n'.join(
 					item['ingredients']
-				))
+				)))
 
-				print '</sphinx:document>'
+				print('</sphinx:document>')
 
 				i += 1
 
-	print '</sphinx:docset>'
+	print('</sphinx:docset>')
 
 xmlpipe()

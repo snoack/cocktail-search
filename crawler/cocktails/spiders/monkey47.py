@@ -1,4 +1,4 @@
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from scrapy.spider import BaseSpider
 from scrapy.http import Request
@@ -40,7 +40,7 @@ class Monkey47Spider(BaseSpider):
 				ingredients.append(html_to_text(ingredient))
 
 		return [CocktailItem(
-			title=html_to_text(title).split(':')[-1].split(u'\u2013')[-1].strip(),
+			title=html_to_text(title).split(':')[-1].split('\u2013')[-1].strip(),
 			picture=None,
 			url=response.url,
 			source='Monkey 47 Blog',

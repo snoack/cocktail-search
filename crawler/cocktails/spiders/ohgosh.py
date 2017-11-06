@@ -1,4 +1,4 @@
-from urlparse import urljoin, urlparse
+from urllib.parse import urljoin, urlparse
 from itertools import groupby
 from functools import partial
 
@@ -49,5 +49,5 @@ class OhGoshSpider(BaseSpider):
 				picture=picture,
 				url=url,
 				source='Oh Gosh!',
-				ingredients=map(html_to_text, ingredients),
+				ingredients=[html_to_text(x) for x in ingredients],
 			)

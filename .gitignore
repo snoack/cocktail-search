@@ -3,4 +3,3 @@
 crawler/*.json
 sphinx/idx_*
 web/settings.py
-web/sphinxapi.py

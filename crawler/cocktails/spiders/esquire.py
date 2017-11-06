@@ -1,4 +1,4 @@
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from scrapy.contrib.spiders import SitemapSpider
 from scrapy.selector import HtmlXPathSelector

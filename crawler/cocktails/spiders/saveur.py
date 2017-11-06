@@ -1,4 +1,4 @@
-from urlparse import urljoin
+from urllib.parse import urljoin
 
 from scrapy.spider import BaseSpider
 from scrapy.http import Request
