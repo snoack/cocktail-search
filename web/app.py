@@ -13,7 +13,6 @@ from werkzeug.wrappers import Request, Response
 from werkzeug.exceptions import HTTPException, NotFound, InternalServerError
 from werkzeug.routing import Map, Rule
 from werkzeug.urls import url_decode
-from werkzeug.utils import escape
 
 try:
     import settings
