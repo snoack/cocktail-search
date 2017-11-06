@@ -118,7 +118,6 @@ class CocktailsApp(object):
         if query is None:
             return None
 
-        sphinx.SetMatchMode(sphinxapi.SPH_MATCH_EXTENDED2)
         sphinx.SetRankingMode(sphinxapi.SPH_RANK_MATCHANY)
         sphinx.SetLimits(offset, MAX_COCKTAILS_PER_PAGE)
         sphinx.SetGroupBy('title_normalized', sphinxapi.SPH_GROUPBY_ATTR, '@relevance DESC, @count DESC, @id ASC')
