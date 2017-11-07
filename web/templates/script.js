@@ -1,26 +1,96 @@
-$(function() {
+var waitingForServiceWorker = false;
+var collection = null;
+
+if ('serviceWorker' in navigator && 'caches' in window) {
+	// Defer queries until the Service Worker is controlling this client,
+	// to make sure that the initial query is cached. Otherwise, when going
+	// offline, reloading the page won't show any data.
+	waitingForServiceWorker = true;
+	navigator.serviceWorker.register('/serviceworker.js').then(
+		function(registration) {
+			// If the Service Worker is active right after registration, that means it
+			// was already installed before, and if it is not controlling this client
+			// yet, it likely never will during this session. This happens for example
+			// when force reloading (Ctrl+F5) or when there is another active client
+			// still being controlled by an outdated version of the Service Worker.
+			if (!registration.active)
+				return new Promise(function(resolve) {
+					navigator.serviceWorker.addEventListener('controllerchange', resolve)
+				});
+		},
+		// If registration fails, log the error, but don't propagate
+		// the error down the Promise chain, so that we stop waiting,
+		// still performing any query (but without caching).
+		console.error
+	).then(function() {
+		waitingForServiceWorker = false;
+		if (collection)
+			collection.retry();
+	});
+
+	// Populate the cache with our assets, based on the resources that have been
+	// encountered during page load. Normally, you'd hard-code your assets inside
+	// the Service Worker and have it add them to the cache during installation.
+	// However, we don't want to block installation, to not slow down first load,
+	// as we wait for the Service Worker (see above). Then again, if the Service
+	// Worker being installed doesn't imply all assets being cached, we have to
+	// keep try fetching missing assets. Furthermore, the location of some of our
+	// assets (i.e. the Google Web Font) cannot be predicted in advance.
+	window.addEventListener('load', function() {
+		caches.open('assets:{{ get_assets_checksum() }}').then(function(cache) {
+			var assets = [document.location.href];
+			var entries = performance.getEntriesByType('resource');
+
+			for (var i = 0; i < entries.length; i++) {
+				var entry = entries[i];
+				var type = entry.initiatorType;
+				if (type == 'link' || type == 'script' || type == 'css')
+					assets.push(entry.name);
+			}
+
+			assets.forEach(function(url) {
+				 cache.match(url).then(function(response) {
+					if (!response)
+						cache.add(url);
+				});
+			});
+		});
+	});
+}
+
+document.addEventListener("DOMContentLoaded", function() {
 	var Cocktail = Backbone.Model.extend();
 
 	var SearchResults = Backbone.Collection.extend({
 		model: Cocktail,
 
 		url: function() {
-			var params = [];
-
-			if (this.index_updated)
-				params.push({name: 'index_updated', value: this.index_updated});
-
-			for (var i = 0; i < this.ingredients.length; i++)
-				params.push({name: 'ingredient', value: this.ingredients[i]});
-
-			return '/recipes' + (params.length ? '?' + $.param(params) : '');
+			return '/recipes' + (this.ingredients.length == 0 ? '' : '?' + $.param(
+				this.ingredients.map(function(ingredient) {
+					return {name: 'ingredient', value: ingredient};
+				})
+			));
 		},
 
 		parse: function(resp, options) {
-			this.canLoadMore = resp.cocktails.length > 0;
-			this.index_updated = resp.index_updated;
+			this.canLoadMore = resp.length > 0;
+			return resp;
+		},
 
-			return resp.cocktails;
+		query: function(ingredients) {
+			this.ingredients = ingredients;
+			this.isStale = waitingForServiceWorker;
+
+			if (!waitingForServiceWorker)
+				this.fetch({error: function(collection) {
+					collection.isStale = true;
+					collection.set([]);
+				}});
+		},
+
+		retry: function() {
+			if (this.isStale)
+				this.query(this.ingredients);
 		}
 	});
 
@@ -119,7 +189,7 @@ $(function() {
 		}
 	});
 
-	var collection = new SearchResults();
+	collection = new SearchResults();
 	var searchResultsView = new SearchResultsView({collection: collection});
 
 	var results = $('#search-results');
@@ -178,9 +248,7 @@ $(function() {
 			state_is_volatile = true;
 
 			updateTitle();
-
-			collection.ingredients = ingredients;
-			collection.fetch();
+			collection.query(ingredients);
 		});
 
 		field.blur(function() {
@@ -222,9 +290,7 @@ $(function() {
 
 		addField().focus();
 		updateTitle();
-
-		collection.ingredients = ingredients;
-		collection.fetch();
+		collection.query(ingredients);
 	};
 
 	var adjustSourcesWidthOnResize = function() {
@@ -260,6 +326,10 @@ $(function() {
 
 		collection.canLoadMore = false;
 		collection.fetch({remove:false, data:{offset:collection.length}});
+	});
+
+	viewport.on('online', function() {
+		collection.retry();
 	});
 
 	viewport.on('popstate', populateForm);
