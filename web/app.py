@@ -3,10 +3,10 @@
 import os
 import re
 import json
-import posixpath
 import mimetypes
 import subprocess
 from urllib.parse import urlencode
+from functools import partial
 
 import sphinxapi
 from werkzeug.wrappers import Request, Response
@@ -30,58 +30,11 @@ LESSC_OPTIONS = getattr(settings, 'LESSC_OPTIONS', [])
 STATIC_FILES_DIR = os.path.join(os.path.dirname(__file__), 'static')
 INDEX_FILE = os.path.join(os.path.dirname(__file__), os.path.pardir, 'sphinx', 'idx_recipes.spd')
 
-OPENSEARCH_TEMPLATE = '''\
-<?xml version="1.0"?>
-<OpenSearchDescription xmlns="http://a9.com/-/spec/opensearch/1.1/">
-    <ShortName>Cocktail Search</ShortName>
-    <Url type="text/html" template="%(site_url)s#{searchTerms}"/>
-</OpenSearchDescription>
-'''
-
-JSLICENSE_TEMPLATE = '''\
-<!DOCTYPE html>
-<html>
-<head>
-<title>Cocktail search | JavaScript License Information</title>
-</head>
-<body>
-<table id="jslicense-labels1">
-<tr>
-<td><a href="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js">jquery.min.js</a></td>
-<td><a href="http://www.jclark.com/xml/copying.txt">Expat</a></td>
-<td><a href="https://github.com/jquery/jquery/archive/1.9.1.zip">jquery-1.9.1.zip</a></td>
-</tr>
-<tr>
-<td><a href="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.4.4/underscore-min.js">underscore-min.js</a></td>
-<td><a href="http://www.jclark.com/xml/copying.txt">Expat</a></td>
-<td><a href="https://github.com/jashkenas/underscore/archive/1.4.4.zip">underscore-1.4.4.zip</a></td>
-</tr>
-<tr>
-<td><a href="http://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js">backbone-min.js</a></td>
-<td><a href="http://www.jclark.com/xml/copying.txt">Expat</a></td>
-<td><a href="https://github.com/jashkenas/backbone/archive/1.0.0.zip">backbone-1.0.0.zip</a></td>
-</tr>
-<tr>
-<td><a href="%(site_url)sstatic/script.js">script.js</a></td>
-<td><a href="http://www.gnu.org/licenses/agpl-3.0.html">GNU-AGPL-3.0</a></td>
-<td><a href="%(site_url)sstatic/script.js">script.js</a></td>
-</tr>
-</table>
-</body>
-</html>
-'''
-
 
 class CocktailsApp(object):
     urls = Map([
         Rule('/recipes', endpoint='recipes'),
     ])
-
-    generated_files = {
-        'all.css': 'css',
-        'opensearch.xml': 'open_search_description',
-        'jslicense.html': 'jslicense',
-    }
 
     def make_query(self, sphinx, ingredients):
         queries = []
@@ -211,11 +164,24 @@ class CocktailsApp(object):
         with subprocess.Popen(args, stdout=subprocess.PIPE) as lessc:
             yield from lessc.stdout
 
-    def generate_open_search_description(self):
-        return [OPENSEARCH_TEMPLATE % {'site_url': SITE_URL}]
+    def render_template(self, filename, env):
+        return env.get_template(filename).generate(site_url=SITE_URL)
 
-    def generate_jslicense(self):
-        return [JSLICENSE_TEMPLATE % {'site_url': SITE_URL}]
+    def get_generated_files(self):
+        import jinja2
+
+        env = jinja2.Environment(
+            loader=jinja2.FileSystemLoader(
+                os.path.join(os.path.dirname(__file__), 'templates')
+            ),
+            autoescape=True,
+            cache_size=0
+        )
+
+        for filename in env.loader.list_templates():
+            yield filename, partial(self.render_template, filename, env)
+
+        yield 'all.css', self.generate_css
 
     def cmd_runserver(self, listen='8000'):
         from werkzeug.serving import run_simple
@@ -228,12 +194,11 @@ class CocktailsApp(object):
         self.urls.add(Rule('/', endpoint='index'))
 
         def view_generated(request, path):
-            endpoint = self.generated_files.get(path)
-            if endpoint is None:
-                raise NotFound
-            iterable = getattr(self, 'generate_' + endpoint)()
-            mimetype = mimetypes.guess_type(path)[0]
-            return Response(iterable, mimetype=mimetype)
+            for filename, fn in self.get_generated_files():
+                if path == filename:
+                    mimetype = mimetypes.guess_type(path)[0]
+                    return Response(fn(), mimetype=mimetype)
+            raise NotFound
 
         self.view_generated = view_generated
         self.urls.add(Rule('/static/<path:path>', endpoint='generated'))
@@ -248,14 +213,10 @@ class CocktailsApp(object):
         })
 
     def cmd_deploy(self):
-        for path, endpoint in self.generated_files.items():
-            print('Generating ' + path)
-
-            iterable = getattr(self, 'generate_' + endpoint)()
-            path = os.path.join(STATIC_FILES_DIR, *posixpath.split(path))
-
-            with open(path, 'wb') as outfile:
-                for data in iterable:
+        for filename, fn in self.get_generated_files():
+            print('Generating ' + filename)
+            with open(os.path.join(STATIC_FILES_DIR, filename), 'wb') as outfile:
+                for data in fn():
                     if isinstance(data, str):
                         data = data.encode('utf-8')
                     outfile.write(data)
