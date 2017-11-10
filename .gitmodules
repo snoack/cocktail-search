@@ -1,3 +1,6 @@
 [submodule "web/bootstrap"]
-	path = web/bootstrap
+	path = web/external/bootstrap
 	url = https://github.com/twitter/bootstrap.git
+[submodule "web/external/github-fork-ribbon-css"]
+	path = web/external/github-fork-ribbon-css
+	url = https://github.com/simonwhitaker/github-fork-ribbon-css
