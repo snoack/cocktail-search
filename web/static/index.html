@@ -43,46 +43,6 @@
 	</div>
 </div>
 </script>
-<script type="text/template" id="firefox-warning-template">
-<div class="alert">
-	<% if (version < 18) { %>
-		<strong>Update your web browser:</strong> This website is using
-		the latest web technologies. And the version of Firefox that you
-		are using is too old, to use this website. So please <a href="<%
-			if (android) {
-				%>https://play.google.com/store/apps/details?id=org.mozilla.firefox<%
-			} else if (debian) {
-				%>http://mozilla.debian.net/<%
-			} else {
-				%>http://www.mozilla.org/firefox/<%
-			}
-		%>">update to the latest version of Firefox</a> or use a recent
-		version of <a href="<%
-			if (android) {
-				%>https://play.google.com/store/apps/details?id=com.android.chrome<%
-			} else {
-				%>http://www.google.com/chrome/<%
-			}
-		%>">Google Chrome</a> instead.
-	<% } else { %>
-		<strong>Enable flexbox:</strong> In order to make this website
-		render correctly you have to change the about:config preference
-		<em>layout.css.flexbox.enabled</em> to <em>true</em>.
-		<% if (version < 22) { %>
-			Alternatively you can <a href="<%
-				if (android) {
-					%>https://play.google.com/store/apps/details?id=org.mozilla.firefox_beta<%
-				} else if (debian) {
-					%>http://mozilla.debian.net/<%
-				} else {
-					%>http://www.mozilla.org/firefox/beta/<%
-				}
-			%>">update to the beta version of Firefox</a>, where flexbox
-			is enabled by default.
-		<% } %>
-	<% } %>
-</div>
-</script>
 </head>
 <body>
 <div id="firefox-warning">

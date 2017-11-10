@@ -119,30 +119,8 @@ $(function() {
 		}
 	});
 
-	var FirefoxWarningView = Backbone.View.extend({
-		el: $('#firefox-warning'),
-
-		render: function() {
-			var firefoxVersion = navigator.userAgent.match(/ Firefox\/([\d.]+)/);
-
-			if (firefoxVersion)
-			if (!('flex'    in document.body.style))
-			if (!('MozFlex' in document.body.style))
-				this.$el.html(_.template($('#firefox-warning-template').html(), {
-					version: firefoxVersion[1],
-					android: navigator.userAgent.indexOf('Android;')    != -1,
-					debian:  navigator.userAgent.indexOf(' Iceweasel/') != -1
-				}));
-
-			return this;
-		}
-	});
-
 	var collection = new SearchResults();
 	var searchResultsView = new SearchResultsView({collection: collection});
-
-	var firefoxWarningView = new FirefoxWarningView();
-	firefoxWarningView.setElement(firefoxWarningView.render());
 
 	var results = $('#search-results');
 	var form = $('form');
