@@ -196,19 +196,19 @@ document.addEventListener("DOMContentLoaded", function() {
   var form = $('form');
   var viewport = $(window);
 
-  var initial_field = $('input', form).val('');;
-  var empty_field = initial_field.clone();
-  var original_title = document.title;
+  var initialField = $('input', form).val('');;
+  var emptyField = initialField.clone();
+  var originalTitle = document.title;
 
   var offset = 0;
-  var can_load_more = false;
+  var canLoadMore = false;
   var ingredients;
 
   var state;
-  var state_is_volatile;
+  var stateIsVolatile;
 
   var updateTitle = function() {
-    var title = original_title;
+    var title = originalTitle;
 
     if (ingredients.length > 0)
       title += ': ' + ingredients.join(', ');
@@ -217,8 +217,8 @@ document.addEventListener("DOMContentLoaded", function() {
 
   var prepareField = function(field) {
     field.on('input', function() {
-      var has_empty = false;
-      var new_state;
+      var hasEmpty = false;
+      var newState;
 
       ingredients = [];
 
@@ -226,26 +226,26 @@ document.addEventListener("DOMContentLoaded", function() {
         if (field.value != '')
           ingredients.push(field.value);
         else
-          has_empty = true;
+          hasEmpty = true;
       });
 
-      new_state  = ingredients.length > 0 ? '#' : '';
-      new_state += ingredients.map(encodeURIComponent).join(';');
+      newState  = ingredients.length > 0 ? '#' : '';
+      newState += ingredients.map(encodeURIComponent).join(';');
 
-      if (!has_empty)
+      if (!hasEmpty)
         addField();
 
-      if (new_state == state)
+      if (newState == state)
         return;
 
       history[
-        state_is_volatile
+        stateIsVolatile
           ? 'replaceState'
           : 'pushState'
-      ](null, null, new_state || '.');
+      ](null, null, newState || '.');
 
-      state = new_state;
-      state_is_volatile = true;
+      state = newState;
+      stateIsVolatile = true;
 
       updateTitle();
       collection.query(ingredients);
@@ -259,7 +259,7 @@ document.addEventListener("DOMContentLoaded", function() {
   };
 
   var addField = function () {
-    var field = empty_field.clone();
+    var field = emptyField.clone();
 
     form.append(field);
     prepareField(field);
@@ -269,7 +269,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   var populateForm = function() {
     state = document.location.hash;
-    state_is_volatile = false;
+    stateIsVolatile = false;
     ingredients = [];
 
     var bits = state.substring(1).split(';');
@@ -313,11 +313,11 @@ document.addEventListener("DOMContentLoaded", function() {
   };
 
   results.mousedown(function() {
-    state_is_volatile = false;
+    stateIsVolatile = false;
   });
 
   viewport.scroll(function() {
-    state_is_volatile = false;
+    stateIsVolatile = false;
 
     if (!collection.canLoadMore)
       return;
@@ -334,7 +334,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
   viewport.on('popstate', populateForm);
 
-  prepareField(initial_field);
+  prepareField(initialField);
   populateForm();
   adjustSourcesWidthOnResize();
 });
