@@ -1,40 +1,40 @@
 source recipes {
-	type = xmlpipe2
-	xmlpipe_command = $DIRNAME/xmlpipe.py \
-		-i $DIRNAME/../crawler/seriouseats.json \
-		-i $DIRNAME/../crawler/liquor.json \
-		-i $DIRNAME/../crawler/saveur.json \
-		-i $DIRNAME/../crawler/cocktailtimes.json \
-		-u $DIRNAME/../crawler/wikipedia.json \
-		-i $DIRNAME/../crawler/drinkboy.json \
-		-i $DIRNAME/../crawler/ohgosh.json \
-		-i $DIRNAME/../crawler/esquire.json \
-		-i $DIRNAME/../crawler/dradamsbitters.json \
-		-i $DIRNAME/../crawler/kingcocktail.json \
-		-i $DIRNAME/../crawler/monkey47.json \
-		-i $DIRNAME/../crawler/drinksmixer.json \
-		-i $DIRNAME/../crawler/cocktaildb.json
+  type = xmlpipe2
+  xmlpipe_command = $DIRNAME/xmlpipe.py \
+    -i $DIRNAME/../crawler/seriouseats.json \
+    -i $DIRNAME/../crawler/liquor.json \
+    -i $DIRNAME/../crawler/saveur.json \
+    -i $DIRNAME/../crawler/cocktailtimes.json \
+    -u $DIRNAME/../crawler/wikipedia.json \
+    -i $DIRNAME/../crawler/drinkboy.json \
+    -i $DIRNAME/../crawler/ohgosh.json \
+    -i $DIRNAME/../crawler/esquire.json \
+    -i $DIRNAME/../crawler/dradamsbitters.json \
+    -i $DIRNAME/../crawler/kingcocktail.json \
+    -i $DIRNAME/../crawler/monkey47.json \
+    -i $DIRNAME/../crawler/drinksmixer.json \
+    -i $DIRNAME/../crawler/cocktaildb.json
 }
 
 index recipes {
-	source = recipes
-	path = $DIRNAME/idx_recipes
-	morphology = libstemmer_en
-	charset_table = 0..9, A..Z->a..z, a..z, \
-		U+C0->a, U+C1->a, U+C2->a, U+C3->a, U+C4->a, U+C5->a, U+C6->a, U+E0->a, U+E1->a, U+E2->a, U+E3->a, U+E4->a, U+E5->a, U+E6->a, \
-		U+C7->c, U+E7->c, \
-		U+C8->e, U+C9->e, U+CA->e, U+CB->e, U+E8->e, U+E9->e, U+EA->e, U+EB->e, \
-		U+CC->i, U+CD->i, U+CE->i, U+CF->i, U+EC->i, U+ED->i, U+EE->i, U+EF->i, \
-		U+D1->n, U+F1->n, \
-		U+D9->o, U+DA->o, U+DB->o, U+DC->o, U+F2->o, U+F3->o, U+F4->o, U+F5->o, U+F6->o, \
-		U+DA->u, U+DB->u, U+DC->u, U+F9->u, U+FA->u, U+FB->u, U+FC->u, \
-		U+DD->y, U+FD->y, U+FF->y
-	wordforms = $DIRNAME/wordforms.txt
-	index_sp = 1
-	html_strip = 1
+  source = recipes
+  path = $DIRNAME/idx_recipes
+  morphology = libstemmer_en
+  charset_table = 0..9, A..Z->a..z, a..z, \
+    U+C0->a, U+C1->a, U+C2->a, U+C3->a, U+C4->a, U+C5->a, U+C6->a, U+E0->a, U+E1->a, U+E2->a, U+E3->a, U+E4->a, U+E5->a, U+E6->a, \
+    U+C7->c, U+E7->c, \
+    U+C8->e, U+C9->e, U+CA->e, U+CB->e, U+E8->e, U+E9->e, U+EA->e, U+EB->e, \
+    U+CC->i, U+CD->i, U+CE->i, U+CF->i, U+EC->i, U+ED->i, U+EE->i, U+EF->i, \
+    U+D1->n, U+F1->n, \
+    U+D9->o, U+DA->o, U+DB->o, U+DC->o, U+F2->o, U+F3->o, U+F4->o, U+F5->o, U+F6->o, \
+    U+DA->u, U+DB->u, U+DC->u, U+F9->u, U+FA->u, U+FB->u, U+FC->u, \
+    U+DD->y, U+FD->y, U+FF->y
+  wordforms = $DIRNAME/wordforms.txt
+  index_sp = 1
+  html_strip = 1
 }
 
 searchd {
-	listen = $LISTEN
-	pid_file = $DIRNAME/searchd.pid
+  listen = $LISTEN
+  pid_file = $DIRNAME/searchd.pid
 }

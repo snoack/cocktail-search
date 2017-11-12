@@ -12,35 +12,35 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/backbone.js/1.0.0/backbone-min.js"></script>
 <script type="text/template" id="cocktail-template">
 <div class="picture">
-	<% if (recipe.picture_url) { %>
-		<a href="<%- recipe.url %>">
-			<img src="<%- recipe.picture_url %>" alt="<%- recipe.title %>">
-		</a>
-	<% } else { %>
-		<span></span>
-	<% } %>
+  <% if (recipe.picture_url) { %>
+    <a href="<%- recipe.url %>">
+      <img src="<%- recipe.picture_url %>" alt="<%- recipe.title %>">
+    </a>
+  <% } else { %>
+    <span></span>
+  <% } %>
 </div>
 <div class="details">
-	<h2><a href="<%- recipe.url %>"><%- recipe.title %></a></h2>
-	<div class="ingredients-and-sources">
-		<ul class="ingredients">
-			<% _.each(recipe.ingredients, function(ingredient) { %>
-				<li><%- ingredient %></li>
-			<% }); %>
-		</ul>
-		<div class="sources">
-			<h3>Source</h3>
-			<ul>
-				<% _.each(sources, function(recipes, source) { %>
-					<li>
-						<% _.each(recipes, function(otherRecipe, idx) { %>
-							<a <% if (recipe == otherRecipe) { %>class="active"<% } else { %>href="javascript:void(0)"<% } %> data-source="<%- source %>" data-recipe="<%= idx %>"><% if (idx == 0) { %><%- source %><% } else { %>(<%= idx + 1 %>)<% } %></a>
-						<% }); %>
-					</li>
-				<% }); %>
-			</ul>
-		</div>
-	</div>
+  <h2><a href="<%- recipe.url %>"><%- recipe.title %></a></h2>
+  <div class="ingredients-and-sources">
+    <ul class="ingredients">
+      <% _.each(recipe.ingredients, function(ingredient) { %>
+        <li><%- ingredient %></li>
+      <% }); %>
+    </ul>
+    <div class="sources">
+      <h3>Source</h3>
+      <ul>
+        <% _.each(sources, function(recipes, source) { %>
+          <li>
+            <% _.each(recipes, function(otherRecipe, idx) { %>
+              <a <% if (recipe == otherRecipe) { %>class="active"<% } else { %>href="javascript:void(0)"<% } %> data-source="<%- source %>" data-recipe="<%= idx %>"><% if (idx == 0) { %><%- source %><% } else { %>(<%= idx + 1 %>)<% } %></a>
+            <% }); %>
+          </li>
+        <% }); %>
+      </ul>
+    </div>
+  </div>
 </div>
 </script>
 </head>
@@ -48,9 +48,9 @@
 <div id="firefox-warning">
 </div>
 <div id="search-form">
-	<form>
-		<input name="ingredient" type="text" placeholder="Enter an ingredient">
-	</form>
+  <form>
+    <input name="ingredient" type="text" placeholder="Enter an ingredient">
+  </form>
 </div>
 <div id="search-results">
 </div>
